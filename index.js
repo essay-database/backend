@@ -9,7 +9,7 @@ const TOKEN_PATH = 'token.json';
 
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err, content) => {
-  if (err) return console.log('Error loading client secret file:', err);
+  if (err) return console.error('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Drive API.
   authorize(JSON.parse(content), getEssays);
 });
@@ -81,7 +81,13 @@ const orderByOptions = [
 ];
 
 function sendEssays(files) {
-  console.log(files);
+  if (files) {
+    files.forEach(element => {
+      console.log(element.id);
+    });
+  } else {
+    console.error('no files found');
+  }
 }
 
 function getEssays(auth) {
@@ -94,17 +100,19 @@ function getEssays(auth) {
 
 function retrieveAllEssaysInFolder(auth, folderId, callback) {
   var retrievePageOfChildren = function(drive, options, result) {
-    drive.files.list(
+    drive.children.list(
       {
         folderId: folderId,
+        maxResults: 1000,
+        orderBy: orderByOptions[1],
         ...options
       },
       (err, res) => {
-        if (err) return console.log('The API returned an error: ' + err);
-        result = result.concat(res.items);
+        if (err) return console.error('The API returned an error: ' + err);
+        result = result.concat(res.data.items);
         var nextPageToken = res.nextPageToken;
         if (nextPageToken) {
-          retrievePageOfChildren(request, { pageToken: nextPageToken }, result);
+          retrievePageOfChildren(drive, { pageToken: nextPageToken }, result);
         } else {
           callback(result);
         }
