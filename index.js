@@ -1,7 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
-const { secrets } = require('./secrets.json');
+const secrets = require('./secrets.json');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
@@ -85,40 +85,32 @@ function sendEssays(files) {
 }
 
 function getEssays(auth) {
-  const { folderId = null } = secrets;
-  if (!secrets) {
+  if (!secrets || !secrets.folderId) {
     console.error(`folderId not found`);
   } else {
-    retrieveAllEssaysInFolder(auth, folderId, sendEssays);
+    retrieveAllEssaysInFolder(auth, secrets.folderId, sendEssays);
   }
 }
 
 function retrieveAllEssaysInFolder(auth, folderId, callback) {
-  var retrievePageOfChildren = function(request, result, drive) {
-    drive.children.list(
+  var retrievePageOfChildren = function(drive, options, result) {
+    drive.files.list(
       {
-        folderId: '1H8P-D5dLkq4nq2AnjPk8cr3DRR_efS9J',
-        maxResults: 1000
+        folderId: folderId,
+        ...options
       },
       (err, res) => {
         if (err) return console.log('The API returned an error: ' + err);
         result = result.concat(res.items);
         var nextPageToken = res.nextPageToken;
         if (nextPageToken) {
-          request = gapi.client.drive.children.list({
-            folderId: folderId,
-            pageToken: nextPageToken
-          });
-          retrievePageOfChildren(request, result);
+          retrievePageOfChildren(request, { pageToken: nextPageToken }, result);
         } else {
           callback(result);
         }
       }
     );
   };
-  var initialRequest = google.drive.children.list({
-    folderId: folderId
-  });
-  var drive = google.drive({ version: 'v2', auth });
-  retrievePageOfChildren(initialRequest, [], drive);
+  const drive = google.drive({ version: 'v2', auth });
+  retrievePageOfChildren(drive, {}, []);
 }
