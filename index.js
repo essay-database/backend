@@ -1,6 +1,7 @@
 const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
+const { secrets } = require('./secrets.json');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
@@ -10,7 +11,7 @@ const TOKEN_PATH = 'token.json';
 fs.readFile('credentials.json', (err, content) => {
   if (err) return console.log('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Drive API.
-  authorize(JSON.parse(content), listFiles);
+  authorize(JSON.parse(content), getEssays);
 });
 
 /**
@@ -66,28 +67,58 @@ function getAccessToken(oAuth2Client, callback) {
   });
 }
 
-/**
- * Lists the names and IDs of up to 10 files.
- * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
- */
-function listFiles(auth) {
-  const drive = google.drive({ version: 'v3', auth });
-  drive.files.list(
-    {
-      pageSize: 10,
-      fields: 'nextPageToken, files(id, name)'
-    },
-    (err, res) => {
-      if (err) return console.log('The API returned an error: ' + err);
-      const files = res.data.files;
-      if (files.length) {
-        console.log('Files:');
-        files.map(file => {
-          console.log(`${file.name} (${file.id})`);
-        });
-      } else {
-        console.log('No files found.');
+const orderByOptions = [
+  'createdDate',
+  'folder',
+  'lastViewedByMeDate',
+  'modifiedByMeDate',
+  'modifiedDate',
+  'quotaBytesUsed',
+  'recency',
+  'sharedWithMeDate',
+  'starred',
+  'title'
+];
+
+function sendEssays(files) {
+  console.log(files);
+}
+
+function getEssays(auth) {
+  const { folderId = null } = secrets;
+  if (!secrets) {
+    console.error(`folderId not found`);
+  } else {
+    retrieveAllEssaysInFolder(auth, folderId, sendEssays);
+  }
+}
+
+function retrieveAllEssaysInFolder(auth, folderId, callback) {
+  var retrievePageOfChildren = function(request, result, drive) {
+    drive.children.list(
+      {
+        folderId: '1H8P-D5dLkq4nq2AnjPk8cr3DRR_efS9J',
+        maxResults: 1000
+      },
+      (err, res) => {
+        if (err) return console.log('The API returned an error: ' + err);
+        result = result.concat(res.items);
+        var nextPageToken = res.nextPageToken;
+        if (nextPageToken) {
+          request = gapi.client.drive.children.list({
+            folderId: folderId,
+            pageToken: nextPageToken
+          });
+          retrievePageOfChildren(request, result);
+        } else {
+          callback(result);
+        }
       }
-    }
-  );
+    );
+  };
+  var initialRequest = google.drive.children.list({
+    folderId: folderId
+  });
+  var drive = google.drive({ version: 'v2', auth });
+  retrievePageOfChildren(initialRequest, [], drive);
 }
