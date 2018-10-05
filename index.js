@@ -5,9 +5,7 @@ const secrets = require('./secrets.json');
 const { join } = require('path');
 
 // If modifying these scopes, delete token.json.
-const SCOPES = [
-  'https://www.googleapis.com/auth/drive'
-];
+const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const TOKEN_PATH = 'token.json';
 
 // Load client secrets from a local file.
@@ -95,7 +93,7 @@ function retrieveAllEssaysInFolder(auth, folderId, callback) {
   const retrievePageOfChildren = function(drive, { pageToken }, result) {
     drive.children.list({
         folderId: folderId,
-        maxResults: 1000,
+        maxResults: 100,
         orderBy: orderByOptions[1],
         pageToken
       },
@@ -125,11 +123,12 @@ async function sendEssays(files, drive) {
     const dir = './tmp';
     mkdirCustom(dir);
     await Promise.all(
-      files.map((file, idx) => {
+      files
+      .map((file, idx) => {
         downloadFile(drive, file.id, join(dir, `essay${idx}.txt`));
       })
-      .catch((err) => {
-        console.error(`Error fetching file ${file.id}`)
+      .catch(err => {
+        console.error(`Error fetching file ${file.id}`);
       })
     );
   } else {
@@ -153,6 +152,6 @@ function downloadFile(drive, fileId, fileName) {
         console.error('Error during download', err);
         reject(false);
       })
-      .pipe(dest)
+      .pipe(dest);
   });
 }
