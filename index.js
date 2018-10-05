@@ -80,16 +80,6 @@ const orderByOptions = [
   'title'
 ];
 
-function sendEssays(files) {
-  if (files) {
-    files.forEach(element => {
-      console.log(element.id);
-    });
-  } else {
-    console.error('no files found');
-  }
-}
-
 function getEssays(auth) {
   if (!secrets || !secrets.folderId) {
     console.error(`folderId not found`);
@@ -99,26 +89,56 @@ function getEssays(auth) {
 }
 
 function retrieveAllEssaysInFolder(auth, folderId, callback) {
-  var retrievePageOfChildren = function(drive, options, result) {
+  const retrievePageOfChildren = function(drive, { pageToken }, result) {
     drive.children.list(
       {
         folderId: folderId,
         maxResults: 1000,
         orderBy: orderByOptions[1],
-        ...options
+        pageToken
       },
       (err, res) => {
         if (err) return console.error('The API returned an error: ' + err);
         result = result.concat(res.data.items);
-        var nextPageToken = res.nextPageToken;
+        const nextPageToken = res.nextPageToken;
         if (nextPageToken) {
           retrievePageOfChildren(drive, { pageToken: nextPageToken }, result);
         } else {
-          callback(result);
+          callback(result, drive);
         }
       }
     );
   };
   const drive = google.drive({ version: 'v2', auth });
   retrievePageOfChildren(drive, {}, []);
+}
+async function sendEssays(files, drive) {
+  if (files) {
+    await Promise.all(
+      files.map(({ id: fileId }, idx) => {
+        downloadFile(drive, fileId, `essay${idx}.txt`);
+      })
+    );
+  } else {
+    console.error('no files found');
+  }
+}
+function downloadFile(drive, fileId, fileName) {
+  return new Promise((resolve, reject) => {
+    const dest = fs.createWriteStream(fileName);
+    drive.files
+      .export({
+        fileId: fileId,
+        mimeType: 'text/plain'
+      })
+      .on('end', function() {
+        console.log('Done');
+        resolve(true);
+      })
+      .on('error', function(err) {
+        console.err('Error during download', err);
+        reject(false);
+      })
+      .pipe(dest);
+  });
 }
