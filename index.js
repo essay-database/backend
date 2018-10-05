@@ -94,7 +94,7 @@ function retrieveAllEssaysInFolder(auth, folderId, callback) {
     drive.children.list({
         folderId: folderId,
         orderBy: orderByOptions[1],
-        maxResults: 10,
+        maxResults: 20,
         pageToken
       },
       (err, res) => {

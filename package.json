@@ -6,18 +6,22 @@
   "dependencies": {
     "googleapis": "^27.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  },
   "scripts": {
+    "start": "nodemon index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/essayDB/backend.git"
   },
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/essayDB/backend/issues"
+  "author": {
+    "email": "info@uaprivacy.com",
+    "name": "uaprivacy",
+    "url": "https://www.uaprivacy.com"
   },
-  "homepage": "https://github.com/essayDB/backend#readme"
+  "private": true,
+  "license": "UNLICENCED"
 }
