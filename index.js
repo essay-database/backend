@@ -5,7 +5,10 @@ const secrets = require('./secrets.json');
 const { join } = require('path');
 
 // If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/drive'];
+const SCOPES = [
+  'https://www.googleapis.com/auth/drive',
+  'https://www.googleapis.com/auth/drive.metadata'
+];
 const TOKEN_PATH = 'token.json';
 
 // Load client secrets from a local file.
@@ -124,8 +127,8 @@ async function sendEssays(files, drive) {
     const dir = './tmp';
     mkdirCustom(dir);
     await Promise.all(
-      files.map(({ id: fileId }, idx) => {
-        // downloadFile(drive, fileId, join(dir, `essay${idx}.txt`));
+      files.map((file, idx) => {
+        downloadFile(drive, file.id, join(dir, `essay${idx}.txt`));
       })
     );
   } else {
@@ -145,7 +148,7 @@ function downloadFile(drive, fileId, fileName) {
         resolve(true);
       })
       .on('error', function(err) {
-        console.err('Error during download', err);
+        console.error('Error during download', err);
         reject(false);
       })
       .pipe(dest);
