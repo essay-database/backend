@@ -93,8 +93,8 @@ function retrieveAllEssaysInFolder(auth, folderId, callback) {
   const retrievePageOfChildren = function(drive, { pageToken }, result) {
     drive.children.list({
         folderId: folderId,
-        maxResults: 100,
         orderBy: orderByOptions[1],
+        maxResults: 10,
         pageToken
       },
       (err, res) => {
@@ -125,12 +125,12 @@ async function sendEssays(files, drive) {
     await Promise.all(
       files
       .map((file, idx) => {
-        downloadFile(drive, file.id, join(dir, `essay${idx}.txt`));
+        downloadFile(drive, file.id, join(dir, `essay${idx}.txt`))
+          .catch(err => {
+            console.error('Error fetching file', err);
+          })
       })
-      .catch(err => {
-        console.error(`Error fetching file ${file.id}`);
-      })
-    );
+    )
   } else {
     console.error('no files found');
   }
@@ -143,15 +143,17 @@ function downloadFile(drive, fileId, fileName) {
       .export({
         fileId: fileId,
         mimeType: 'text/plain'
+      }, { responseType: 'stream' }, (err, res) => {
+        res.data
+          .on('end', function() {
+            console.log(`Done`)
+            resolve(true);
+          })
+          .on('error', function(err) {
+            reject(`Error during downloading ${fileName}: ${err}`);
+          })
+          .pipe(dest);
       })
-      .on('end', function() {
-        console.log('Done');
-        resolve(true);
-      })
-      .on('error', function(err) {
-        console.error('Error during download', err);
-        reject(false);
-      })
-      .pipe(dest);
+
   });
 }
