@@ -2,9 +2,10 @@ const fs = require('fs');
 const readline = require('readline');
 const { google } = require('googleapis');
 const secrets = require('./secrets.json');
+const { join } = require('path');
 
 // If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/drive.metadata.readonly'];
+const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const TOKEN_PATH = 'token.json';
 
 // Load client secrets from a local file.
@@ -112,11 +113,19 @@ function retrieveAllEssaysInFolder(auth, folderId, callback) {
   const drive = google.drive({ version: 'v2', auth });
   retrievePageOfChildren(drive, {}, []);
 }
+
+function mkdirCustom(dir) {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+}
 async function sendEssays(files, drive) {
   if (files) {
+    const dir = './tmp';
+    mkdirCustom(dir);
     await Promise.all(
       files.map(({ id: fileId }, idx) => {
-        downloadFile(drive, fileId, `essay${idx}.txt`);
+        // downloadFile(drive, fileId, join(dir, `essay${idx}.txt`));
       })
     );
   } else {
