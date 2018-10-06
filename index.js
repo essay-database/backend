@@ -3,6 +3,7 @@ const readline = require('readline');
 const { google } = require('googleapis');
 const secrets = require('./secrets.json');
 const { join } = require('path');
+const http = require('http')
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
@@ -157,3 +158,11 @@ function downloadFile(drive, fileId, fileName) {
 
   });
 }
+
+
+http.createServer(function(request, response) {
+    response.writeHead(200, { 'Content-Type': 'text/plain' });
+    response.end('Hello World\n');
+  })
+  .listen(8124);
+console.log('Server running at http://127.0.0.1:8124/');

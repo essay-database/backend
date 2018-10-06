@@ -18,9 +18,9 @@
     "url": "git+https://github.com/essayDB/backend.git"
   },
   "author": {
-    "email": "info@uaprivacy.com",
-    "name": "uaprivacy",
-    "url": "https://www.uaprivacy.com"
+    "email": "",
+    "name": "essaydb",
+    "url": ""
   },
   "private": true,
   "license": "UNLICENCED"
