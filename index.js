@@ -159,10 +159,60 @@ function downloadFile(drive, fileId, fileName) {
   });
 }
 
+function getToken() {
+  drive.changes.getStartPageToken({}, function(err, res) {
+    return new Promise((resolve, reject) => {
+      if (err) {
+        reject(err)
+      } else {
+        resolve(res.startPageToken)
+      }
+    });
+  });
+}
 
-http.createServer(function(request, response) {
-    response.writeHead(200, { 'Content-Type': 'text/plain' });
-    response.end('Hello World\n');
-  })
-  .listen(8124);
-console.log('Server running at http://127.0.0.1:8124/');
+function getChanges(pageToken, newStartPageToken, results) {
+  return new Promise((resolve, reject) => {
+    drive.changes.list({
+      pageToken: pageToken,
+      fields: '*'
+    }, function(err, res) {
+      if (err) {
+        reject(err);
+      } else {
+        results = results.concat(res.items);
+        pageToken = res.nextPageToken;
+        newStartPageToken = res.newStartPageToken;
+        if (pageToken) {
+          getChanges(pageToken, newStartPageToken, results);
+        } else {
+          resolve({
+            items: res.items,
+            newStartPageToken,
+          })
+        }
+      }
+    });
+  });
+
+}
+
+async function trackChanges(pageToken) {
+  let token = await getToken();
+  token = getChanges(token, null, []);
+}
+
+
+function startWebServer() {
+  http.createServer(function(request, response) {
+      console.log(request)
+      response.writeHead(200, { 'Content-Type': 'text/plain' });
+      response.end('Hello World\n');
+    })
+    .listen(8124);
+  console.log('Server running at http://127.0.0.1:8124/');
+  trackChanges();
+}
+
+
+startWebServer();
