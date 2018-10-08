@@ -8,6 +8,7 @@ const {
 const essaysPath = './essays';
 const statusOk = 200;
 
+// TODO error 404 for files not found?
 router.get('/', (req, res, next) => {
   fs.readdir(essaysPath, (err, files) => {
     if (err) return next(err)
@@ -28,7 +29,7 @@ router.get('/', (req, res, next) => {
 
 
 router.get('/:id', (req, res, next) => {
-  fs.readFile(join(essaysPath, req.params.id), (err, data) => {
+  fs.readFile(join(essaysPath, `${req.params.id}.txt`), (err, data) => {
     if (err) return next(err)
     res.status(statusOk)
       .send({

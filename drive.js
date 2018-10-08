@@ -8,6 +8,8 @@ const {
   join
 } = require('path');
 
+// TODO replace console.error with Error?
+
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const TOKEN_PATH = 'token.json';
@@ -89,6 +91,8 @@ const orderByOptions = [
   'title'
 ];
 
+const essaysPath = './essays';
+
 function getEssays(auth) {
   if (!secrets || !secrets.folderId) {
     console.error(`folderId not found`);
@@ -97,14 +101,19 @@ function getEssays(auth) {
   }
 }
 
+const options = {
+  orderBy: `${orderByOptions[0]} desc`,
+  maxResults: 12, // dev only
+}
+
 function retrieveAllEssaysInFolder(auth, folderId, callback) {
   const retrievePageOfChildren = function(drive, {
     pageToken
   }, result) {
     drive.children.list({
         folderId: folderId,
-        orderBy: orderByOptions[1],
-        maxResults: 20,
+        orderBy: options.orderBy,
+        maxResults: options.maxResults,
         pageToken
       },
       (err, res) => {
@@ -125,7 +134,7 @@ function retrieveAllEssaysInFolder(auth, folderId, callback) {
     version: 'v2',
     auth
   });
-  retrievePageOfChildren(drive, {}, []);
+  retrievePageOfChildren(drive, '', []);
 }
 
 function mkdirCustom(dir) {
@@ -133,14 +142,14 @@ function mkdirCustom(dir) {
     fs.mkdirSync(dir);
   }
 }
+
 async function sendEssays(files, drive) {
   if (files) {
-    const dir = './production';
     mkdirCustom(dir);
     await Promise.all(
       files
       .map((file, idx) => {
-        downloadFile(drive, file.id, join(dir, `essay${idx}.txt`))
+        downloadFile(drive, file.id, join(essaysPath, `${idx}.txt`))
           .catch(err => {
             console.error('Error fetching file', err);
           })
@@ -151,9 +160,9 @@ async function sendEssays(files, drive) {
   }
 }
 
-function downloadFile(drive, fileId, fileName) {
+function downloadFile(drive, fileId, filename) {
   return new Promise((resolve, reject) => {
-    const dest = fs.createWriteStream(fileName);
+    const dest = fs.createWriteStream(filename);
     drive.files
       .export({
         fileId: fileId,
@@ -161,32 +170,24 @@ function downloadFile(drive, fileId, fileName) {
       }, {
         responseType: 'stream'
       }, (err, res) => {
-        res.data
-          .on('end', function() {
-            console.log(`Done`)
-            resolve(true);
-          })
-          .on('error', function(err) {
-            reject(`Error during downloading ${fileName}: ${err}`);
-          })
-          .pipe(dest);
+        if (err) {
+          reject(err)
+        } else {
+          res.data
+            .on('end', function() {
+              console.log(`Finished downloading ${filename}`);
+              resolve();
+            })
+            .on('error', function(err) {
+              reject(`Error during downloading ${filename}: ${err}`);
+            })
+            .pipe(dest);
+        }
       })
-
   });
 }
 
-function getToken() {
-  drive.changes.getStartPageToken({}, function(err, res) {
-    return new Promise((resolve, reject) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve(res.startPageToken)
-      }
-    });
-  });
-}
-
+// TODO change to watching ??
 function getChanges(pageToken, newStartPageToken, results) {
   return new Promise((resolve, reject) => {
     drive.changes.list({
@@ -210,10 +211,41 @@ function getChanges(pageToken, newStartPageToken, results) {
       }
     });
   });
-
 }
 
-async function trackChanges(pageToken) {
-  let token = await getToken();
-  token = getChanges(token, null, []);
+const updateInterval = 3; // dev every 3 seconds
+
+function applyChange(change) {
+  return new Promise((resolve, reject) => {
+    const filename = join(essaysPath, `${changes.fileId}.txt`);
+    if (change.deleted) {
+      fs.unlink(filename, (err) => {
+        if (err)
+          reject(err);
+        else
+          resolve();
+      })
+    } else if (change.file) {
+      fs.writeFile(filename, (err) => {
+        if (err)
+          reject(err)
+        else
+          resolve()
+      })
+    }
+  });
 }
+
+async function trackChanges() {
+  let newStartPageToken = '';
+  setInterval(() => {
+    const {
+      items,
+      newStartPageToken
+    } = await getChanges('', newStartPageToken, []);
+    await Promise.all(items.map(change => applyChange(change)
+      .catch(err => console.error(`unable to apply changes to ${file.fileId}`))))
+  }, updateInterval);
+}
+
+module.exports = trackChanges;
