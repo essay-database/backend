@@ -4,4 +4,4 @@ const rand = function() {
     .substr(2);
 };
 
-export { rand };
+module.exports = { rand };
