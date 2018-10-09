@@ -97,7 +97,10 @@ function getEssays(auth) {
   if (!secrets || !secrets.folderId) {
     console.error(`folderId not found`);
   } else {
-    retrieveAllEssaysInFolder(auth, secrets.folderId, sendEssays);
+    fs.readdir(essaysPath, (err, files) => {
+      if (err || files.length === 0)
+        retrieveAllEssaysInFolder(auth, secrets.folderId, sendEssays);
+    });
   }
 }
 
@@ -137,15 +140,8 @@ function retrieveAllEssaysInFolder(auth, folderId, callback) {
   retrievePageOfChildren(drive, '', []);
 }
 
-function mkdirCustom(dir) {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir);
-  }
-}
-
 async function sendEssays(files, drive) {
   if (files) {
-    mkdirCustom(essaysPath);
     await Promise.all(
       files
       .map((file, idx) => {

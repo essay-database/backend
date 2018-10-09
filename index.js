@@ -1,7 +1,4 @@
-// packages
 const http = require('http');
-const debug = require('debug')('backend:server');
-// modules
 const app = require('./app');
 
 const port = normalizePort(process.env.PORT || '4000');
@@ -48,5 +45,5 @@ function onListening() {
   const bind = typeof addr === 'string' ?
     'pipe ' + addr :
     'port ' + addr.port;
-  debug('Listening on ' + bind);
+  console.log('Listening on ' + bind);
 }
