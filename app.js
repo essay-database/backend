@@ -7,21 +7,22 @@ const essaysRouter = require('./routes');
 
 const app = express();
 app.use(express.json());
-
-app.use('/essays', essaysRouter);
+app.use('/', essaysRouter);
 
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
+app.use(function (req, res, next) {
   next(createError(404));
 });
 
 // error handler
-app.use(function(err, req, res, next) {
+app.use(function (err, req, res, next) {
   if (res.headersSent) {
-    return next(err)
+    return next(err);
   }
   res.status(err.status || 500);
   res.send('error');
 });
+
+// trackChanges();
 
 module.exports = app;

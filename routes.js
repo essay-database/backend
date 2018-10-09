@@ -8,38 +8,38 @@ const router = express.Router();
 const essaysPath = './essays';
 const statusOk = 200;
 
+function readFile(filename) {
+  return new Promise((resolve, reject) => {
+    fs.readFile(name, (err, data) => {
+      if (err)
+        reject(`unable to readFile ${filename}`);
+      else
+        resolve(data.length);
+    });
+  })
+}
+
 router.get('/', (req, res, next) => {
-  fs.readdir(essaysPath, (err, files) => {
-    if (err) {
-      return next(err)
-    }
-    files = files.filter((name) => name === '.' || name === '.')
-    const essays = [];
-    files.forEach((name) => {
-      fs.readFile(name, (err, data) => {
-        if (err) {
-          return next(err);
-        }
-        essays.push({
-          essays: data
-        })
-      })
-    })
+  fs.readdir(essaysPath, async (err, files) => {
+    if (err) return next(err);
+    files = files.filter((name) => name.endsWith('.txt'));
+    const essays = await Promise.all(files.map(name => readFile(name))).catch(err => next(err));
     res.status(statusOk)
       .json(essays);
   })
 });
 
-router.get('/:id', (req, res, next) => {
-  fs.readFile(join(essaysPath, `${req.params.id}.txt`), (err, data) => {
-    if (err) {
-      return next(err);
-    }
-    res.status(statusOk)
-      .send({
-        essay: data
-      })
-  })
+router.get('/:id', async (req, res, next) => {
+  let data;
+  try {
+    data = await readFile(join(essaysPath, `${req.params.id}.txt`))
+  } catch (error) {
+    return next(error)
+  }
+  res.status(statusOk)
+    .send({
+      essay: data
+    })
 })
 
 
