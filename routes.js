@@ -4,14 +4,20 @@ const fs = require('fs');
 const {
   join
 } = require('path');
-
 const essaysPath = './essays';
 const statusOk = 200;
 
-// TODO error 404 for files not found?
+function createErrorCustom(status, next) {
+  createError(status);
+  next(err)
+}
+
 router.get('/', (req, res, next) => {
   fs.readdir(essaysPath, (err, files) => {
-    if (err) return next(err)
+    if (err) {
+      err.status = 400;
+      return next(err)
+    }
     files = files.filter((name) => name === '.' || name === '.')
     const essays = [];
     files.forEach((name) => {

@@ -10,13 +10,13 @@
     "nodemon": "^1.18.4"
   },
   "scripts": {
-    "start": "nodemon index.js",
-    "build": "",
+    "start": "DEBUG=backend:* nodemon index.js",
+    "build": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/essayDB/backend.git"
+    "url": "https://github.com/essayDB/backend.git"
   },
   "author": {
     "email": "",
