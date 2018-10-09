@@ -4,14 +4,18 @@
   "description": "",
   "main": "index.js",
   "dependencies": {
-    "googleapis": "^27.0.0"
+    "debug": "^4.1.0",
+    "express": "^4.16.3",
+    "googleapis": "^27.0.0",
+    "http-errors": "^1.7.1",
+    "morgan": "^1.9.1"
   },
   "devDependencies": {
     "nodemon": "^1.18.4"
   },
   "scripts": {
     "start": "DEBUG=backend:* nodemon index.js",
-    "build": "npm run build",
+    "build": "",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
