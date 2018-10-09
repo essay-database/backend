@@ -1,7 +1,6 @@
 // packages
 const http = require('http');
 const debug = require('debug')('backend:server');
-const http = require('http');
 // modules
 const app = require('./app');
 

@@ -145,7 +145,7 @@ function mkdirCustom(dir) {
 
 async function sendEssays(files, drive) {
   if (files) {
-    mkdirCustom(dir);
+    mkdirCustom(essaysPath);
     await Promise.all(
       files
       .map((file, idx) => {
@@ -212,8 +212,6 @@ function getChanges(pageToken, newStartPageToken, results) {
   });
 }
 
-const updateInterval = 3; // dev every 3 seconds
-
 function applyChange(change) {
   return new Promise((resolve, reject) => {
     const filename = join(essaysPath, `${changes.fileId}.txt`);
@@ -236,9 +234,11 @@ function applyChange(change) {
   });
 }
 
+const updateInterval = 5; // dev only
+
 async function trackChanges() {
   let token = '';
-  setInterval(() => {
+  setInterval(async() => {
     const changes = await getChanges('', token, []);
     token = changes.newStartPageToken;
     await Promise.all(changes.items.map(change => applyChange(change)
@@ -246,4 +246,4 @@ async function trackChanges() {
   }, updateInterval);
 }
 
-trackChanges();
+module.exports = trackChanges;

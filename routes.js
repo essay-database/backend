@@ -1,6 +1,5 @@
 const express = require('express');
 const fs = require('fs');
-const createError = require('http-errors');
 const {
   join
 } = require('path');
@@ -12,7 +11,6 @@ const statusOk = 200;
 router.get('/', (req, res, next) => {
   fs.readdir(essaysPath, (err, files) => {
     if (err) {
-      err = createError(500, err);
       return next(err)
     }
     files = files.filter((name) => name === '.' || name === '.')
@@ -20,9 +18,6 @@ router.get('/', (req, res, next) => {
     files.forEach((name) => {
       fs.readFile(name, (err, data) => {
         if (err) {
-          err = createError(400, err, {
-            expose: true
-          })
           return next(err);
         }
         essays.push({
@@ -38,7 +33,6 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   fs.readFile(join(essaysPath, `${req.params.id}.txt`), (err, data) => {
     if (err) {
-      err = createError(400, err);
       return next(err);
     }
     res.status(statusOk)
