@@ -191,8 +191,7 @@ function downloadFile(drive, fileId, filename) {
 function getChanges(pageToken, newStartPageToken, results) {
   return new Promise((resolve, reject) => {
     drive.changes.list({
-      pageToken: pageToken,
-      fields: '*'
+      pageToken: pageToken
     }, function(err, res) {
       if (err) {
         reject(err);
@@ -227,6 +226,7 @@ function applyChange(change) {
       })
     } else if (change.file) {
       fs.writeFile(filename, (err) => {
+        downloadFile(drive, changes.fileId, filename);
         if (err)
           reject(err)
         else
@@ -237,14 +237,12 @@ function applyChange(change) {
 }
 
 async function trackChanges() {
-  let newStartPageToken = '';
+  let token = '';
   setInterval(() => {
-    const {
-      items,
-      newStartPageToken
-    } = await getChanges('', newStartPageToken, []);
-    await Promise.all(items.map(change => applyChange(change)
-      .catch(err => console.error(`unable to apply changes to ${file.fileId}`))))
+    const changes = await getChanges('', token, []);
+    token = changes.newStartPageToken;
+    await Promise.all(changes.items.map(change => applyChange(change)
+      .catch(err => console.error(`unable to apply changes to ${file.fileId}: ${err}`))))
   }, updateInterval);
 }
 
