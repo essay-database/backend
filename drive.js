@@ -246,4 +246,4 @@ async function trackChanges() {
   }, updateInterval);
 }
 
-module.exports = trackChanges;
+trackChanges();

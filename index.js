@@ -3,7 +3,7 @@ const http = require('http');
 const debug = require('debug')('backend:server');
 const http = require('http');
 // modules
-const drive = require('./drive');
+const app = require('./app');
 
 const port = normalizePort(process.env.PORT || '4000');
 app.set('port', port);
@@ -11,7 +11,6 @@ const server = http.createServer(app);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
-
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
@@ -23,7 +22,6 @@ function normalizePort(val) {
   }
   return false;
 }
-
 
 function onError(error) {
   if (error.syscall !== 'listen') {
@@ -52,5 +50,4 @@ function onListening() {
     'pipe ' + addr :
     'port ' + addr.port;
   debug('Listening on ' + bind);
-  drive();
 }

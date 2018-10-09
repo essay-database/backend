@@ -1,28 +1,30 @@
 const express = require('express');
-const router = express.Router();
 const fs = require('fs');
+const createError = require('http-errors');
 const {
   join
 } = require('path');
+
+const router = express.Router();
 const essaysPath = './essays';
 const statusOk = 200;
-
-function createErrorCustom(status, next) {
-  createError(status);
-  next(err)
-}
 
 router.get('/', (req, res, next) => {
   fs.readdir(essaysPath, (err, files) => {
     if (err) {
-      err.status = 400;
+      err = createError(500, err);
       return next(err)
     }
     files = files.filter((name) => name === '.' || name === '.')
     const essays = [];
     files.forEach((name) => {
       fs.readFile(name, (err, data) => {
-        if (err) return next(err)
+        if (err) {
+          err = createError(400, err, {
+            expose: true
+          })
+          return next(err);
+        }
         essays.push({
           essays: data
         })
@@ -35,7 +37,10 @@ router.get('/', (req, res, next) => {
 
 router.get('/:id', (req, res, next) => {
   fs.readFile(join(essaysPath, `${req.params.id}.txt`), (err, data) => {
-    if (err) return next(err)
+    if (err) {
+      err = createError(400, err);
+      return next(err);
+    }
     res.status(statusOk)
       .send({
         essay: data
