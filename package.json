@@ -14,7 +14,7 @@
     "nodemon": "^1.18.4"
   },
   "scripts": {
-    "start": "DEBUG=backend:* nodemon index.js",
+    "start": "PORT=4000 DEBUG=* nodemon index.js",
     "build": "",
     "test": "echo \"Error: no test specified\" && exit 1"
   },

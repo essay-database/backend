@@ -33,7 +33,6 @@ router.get('/', (req, res, next) => {
   })
 });
 
-
 router.get('/:id', (req, res, next) => {
   fs.readFile(join(essaysPath, `${req.params.id}.txt`), (err, data) => {
     if (err) return next(err)
