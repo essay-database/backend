@@ -3,8 +3,8 @@ function createError(status, message, next) {
     error.status = status;
     if (next) next(error);
     else return error
-  }
+}
 
-  module.exports = {
-      createError
-  }
+module.exports = {
+    createError
+}
