@@ -20,9 +20,11 @@ function readFileWrapper(filename) {
   return new Promise((resolve, reject) => {
     readFile(filename, (err, data) => {
       if (err)
-        reject(new Error(`unable to readFile ${filename}`));
+        reject(new Error(`unable to read ${filename}`));
       else
-        resolve(data.length);
+        resolve({
+          content: data.length
+        });
     });
   })
 }
@@ -42,7 +44,7 @@ router.get('/:id', async (req, res, next) => {
   try {
     data = await readFileWrapper(join(essaysPath, `${req.params.id}.txt`))
   } catch (error) {
-    return createError(404, err.message, next);
+    return createError(404, error.message, next);
   }
   res.status(statusOk)
     .send({

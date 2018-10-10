@@ -110,7 +110,7 @@ const options = {
 }
 
 function retrieveAllEssaysInFolder(auth, folderId, callback) {
-  const retrievePageOfChildren = function(drive, {
+  const retrievePageOfChildren = function (drive, {
     pageToken
   }, result) {
     drive.children.list({
@@ -144,8 +144,8 @@ async function sendEssays(files, drive) {
   if (files) {
     await Promise.all(
       files
-      .map((file, idx) => {
-        downloadFile(drive, file.id, join(essaysPath, `${idx}.txt`))
+      .map((file) => {
+        downloadFile(drive, file.id, join(essaysPath, `${file.id}.txt`))
           .catch(err => {
             console.error('Error fetching file', err);
           })
@@ -170,11 +170,11 @@ function downloadFile(drive, fileId, filename) {
           reject(err)
         } else {
           res.data
-            .on('end', function() {
+            .on('end', function () {
               console.log(`Finished downloading ${filename}`);
               resolve();
             })
-            .on('error', function(err) {
+            .on('error', function (err) {
               reject(`Error during downloading ${filename}: ${err}`);
             })
             .pipe(dest);
@@ -188,7 +188,7 @@ function getChanges(pageToken, newStartPageToken, results) {
   return new Promise((resolve, reject) => {
     drive.changes.list({
       pageToken: pageToken
-    }, function(err, res) {
+    }, function (err, res) {
       if (err) {
         reject(err);
       } else {
@@ -234,7 +234,7 @@ const updateInterval = 5; // dev only
 
 async function trackChanges() {
   let token = '';
-  setInterval(async() => {
+  setInterval(async () => {
     const changes = await getChanges('', token, []);
     token = changes.newStartPageToken;
     await Promise.all(changes.items.map(change => applyChange(change)
