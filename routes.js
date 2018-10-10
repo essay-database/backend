@@ -21,7 +21,7 @@ function readFile(filename) {
 
 router.get('/', (req, res, next) => {
   fs.readdir(essaysPath, async (err, files) => {
-    if (err) return next(err);
+    if (err) return createError(500, err, next)
     files = files.filter((name) => name.endsWith('.txt'));
     const essays = await Promise.all(files.map(name => readFile(name))).catch(err => next(err));
     res.status(statusOk)

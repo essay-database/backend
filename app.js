@@ -1,17 +1,17 @@
 // packages
 const express = require('express');
-const createError = require('http-errors');
 // modules
 const trackChanges = require('./drive'); // runs code in drive
 const essaysRouter = require('./routes');
+const  { createError} = require('./shared');
 
 const app = express();
 app.use(express.json());
-app.use('/', essaysRouter);
+app.use('/essays', essaysRouter);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
-  next(createError(404));
+  next(createError(404, 'Not found'));
 });
 
 // error handler
@@ -20,6 +20,7 @@ app.use(function (err, req, res, next) {
     return next(err);
   }
   res.status(err.status || 500);
+  console.error(err);
   res.send('error');
 });
 
