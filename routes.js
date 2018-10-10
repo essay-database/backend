@@ -16,19 +16,6 @@ const router = express.Router();
 const essaysPath = './essays';
 const statusOk = 200;
 
-function readFileWrapper(filename) {
-  return new Promise((resolve, reject) => {
-    readFile(filename, (err, data) => {
-      if (err)
-        reject(new Error(`unable to read ${filename}`));
-      else
-        resolve({
-          content: data.length
-        });
-    });
-  })
-}
-
 router.get('/', (req, res, next) => {
   readdir(essaysPath, async (err, files) => {
     if (err) return createError(500, err.message, next);
@@ -52,5 +39,17 @@ router.get('/:id', async (req, res, next) => {
     })
 })
 
+function readFileWrapper(filename) {
+  return new Promise((resolve, reject) => {
+    readFile(filename, (err, data) => {
+      if (err)
+        reject(new Error(`unable to read ${filename}`));
+      else
+        resolve({
+          content: data.length
+        });
+    });
+  })
+}
 
 module.exports = router;

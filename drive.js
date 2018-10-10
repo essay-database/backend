@@ -18,7 +18,7 @@ const TOKEN_PATH = 'token.json';
 fs.readFile('credentials.json', (err, content) => {
   if (err) return console.error('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Drive API.
-  authorize(JSON.parse(content), getEssays);
+  authorize(JSON.parse(content), getEssaysAndTrackChanges);
 });
 
 /**
@@ -93,13 +93,22 @@ const orderByOptions = [
 
 const essaysPath = './essays';
 
-function getEssays(auth) {
+function getEssaysAndTrackChanges(auth) {
+  const drive = google.drive({
+    version: 'v2',
+    auth
+  });
+  getEssays(drive);
+  trackChanges(drive);
+}
+
+function getEssays(drive) {
   if (!secrets || !secrets.folderId) {
     console.error(`folderId not found`);
   } else {
     fs.readdir(essaysPath, (err, files) => {
       if (err || files.length === 0)
-        retrieveAllEssaysInFolder(auth, secrets.folderId, sendEssays);
+        retrieveAllEssaysInFolder(drive, secrets.folderId, sendEssays);
     });
   }
 }
@@ -109,10 +118,8 @@ const options = {
   maxResults: 12, // dev only
 }
 
-function retrieveAllEssaysInFolder(auth, folderId, callback) {
-  const retrievePageOfChildren = function (drive, {
-    pageToken
-  }, result) {
+function retrieveAllEssaysInFolder(drive, folderId, callback) {
+  const retrievePageOfChildren = (pageToken, result) => {
     drive.children.list({
         folderId: folderId,
         orderBy: options.orderBy,
@@ -124,20 +131,14 @@ function retrieveAllEssaysInFolder(auth, folderId, callback) {
         result = result.concat(res.data.items);
         const nextPageToken = res.nextPageToken;
         if (nextPageToken) {
-          retrievePageOfChildren(drive, {
-            pageToken: nextPageToken
-          }, result);
+          retrievePageOfChildren(nextPageToken, result);
         } else {
           callback(result, drive);
         }
       }
     );
   };
-  const drive = google.drive({
-    version: 'v2',
-    auth
-  });
-  retrievePageOfChildren(drive, '', []);
+  retrievePageOfChildren('', []);
 }
 
 async function sendEssays(files, drive) {
@@ -184,7 +185,7 @@ function downloadFile(drive, fileId, filename) {
 }
 
 // TODO change to watching ??
-function getChanges(pageToken, newStartPageToken, results) {
+function getChanges(drive, pageToken, newStartPageToken, results) {
   return new Promise((resolve, reject) => {
     drive.changes.list({
       pageToken: pageToken
@@ -196,7 +197,7 @@ function getChanges(pageToken, newStartPageToken, results) {
         pageToken = res.nextPageToken;
         newStartPageToken = res.newStartPageToken;
         if (pageToken) {
-          getChanges(pageToken, newStartPageToken, results);
+          getChanges(drive, pageToken, newStartPageToken, results);
         } else {
           resolve({
             items: res.items,
@@ -232,14 +233,12 @@ function applyChange(change) {
 
 const updateInterval = 5; // dev only
 
-async function trackChanges() {
+function trackChanges(drive) {
   let token = '';
   setInterval(async () => {
-    const changes = await getChanges('', token, []);
+    const changes = await getChanges(drive, '', token, []);
     token = changes.newStartPageToken;
     await Promise.all(changes.items.map(change => applyChange(change)
       .catch(err => console.error(`unable to apply changes to ${file.fileId}: ${err}`))))
   }, updateInterval);
 }
-
-module.exports = trackChanges;
