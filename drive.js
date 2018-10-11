@@ -8,8 +8,6 @@ const {
   join
 } = require('path');
 
-// TODO replace console.error with Error?
-
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const TOKEN_PATH = 'token.json';
@@ -93,13 +91,31 @@ const orderByOptions = [
 
 const essaysPath = './essays';
 
+// TODO change to watching ??
 function getEssaysAndTrackChanges(auth) {
   const drive = google.drive({
     version: 'v2',
     auth
   });
   getEssays(drive);
-  trackChanges(drive);
+  trackChanges(drive)
+}
+
+const updateInterval = 1000 * 50; // dev only
+
+async function trackChanges(drive) {
+  let token = '';
+  setInterval(async () => {
+    getChanges(drive, token, applyChanges);
+  }, updateInterval);
+}
+
+async function applyChanges(changes) {
+  if (changes) {
+    await Promise.all(changes.map((change) => applyChange(change).catch(err => console.error(`unable to apply changes to ${file.fileId}: ${err}`))));
+  } else {
+    console.error(`no changes found!`);
+  }
 }
 
 function getEssays(drive) {
@@ -119,7 +135,7 @@ const options = {
 }
 
 function retrieveAllEssaysInFolder(drive, folderId, callback) {
-  const retrievePageOfChildren = (pageToken, result) => {
+  function retrievePageOfChildren(pageToken, result) {
     drive.children.list({
         folderId: folderId,
         orderBy: options.orderBy,
@@ -127,34 +143,18 @@ function retrieveAllEssaysInFolder(drive, folderId, callback) {
         pageToken
       },
       (err, res) => {
-        if (err) return console.error('The API returned an error: ' + err);
+        if (err) return console.error('The API list returned an error: ' + err);
         result = result.concat(res.data.items);
         const nextPageToken = res.nextPageToken;
         if (nextPageToken) {
           retrievePageOfChildren(nextPageToken, result);
         } else {
-          callback(result, drive);
+          callback(drive, result);
         }
       }
     );
   };
   retrievePageOfChildren('', []);
-}
-
-async function sendEssays(files, drive) {
-  if (files) {
-    await Promise.all(
-      files
-      .map((file) => {
-        downloadFile(drive, file.id, join(essaysPath, `${file.id}.txt`))
-          .catch(err => {
-            console.error('Error fetching file', err);
-          })
-      })
-    )
-  } else {
-    console.error('no files found');
-  }
 }
 
 function downloadFile(drive, fileId, filename) {
@@ -176,7 +176,7 @@ function downloadFile(drive, fileId, filename) {
               resolve();
             })
             .on('error', function (err) {
-              reject(`Error during downloading ${filename}: ${err}`);
+              reject(new Error(`Error during downloading ${filename}: ${err}`));
             })
             .pipe(dest);
         }
@@ -184,29 +184,45 @@ function downloadFile(drive, fileId, filename) {
   });
 }
 
-// TODO change to watching ??
-function getChanges(drive, pageToken, newStartPageToken, results) {
-  return new Promise((resolve, reject) => {
+async function sendEssays(drive, files) {
+  if (files) {
+    await Promise.all(
+      files
+      .map((file) => {
+        downloadFile(drive, file.id, join(essaysPath, `${file.id}.txt`))
+          .catch(err => {
+            console.error('Error fetching file', err);
+          })
+      })
+    )
+  } else {
+    console.error('no files found');
+  }
+}
+
+function getChanges(drive, token, callback) {
+  function childHelper(pageToken, results) {
     drive.changes.list({
       pageToken: pageToken
     }, function (err, res) {
       if (err) {
-        reject(err);
+        return console.error('The API list returned an error: ' + err);
       } else {
         results = results.concat(res.items);
         pageToken = res.nextPageToken;
         newStartPageToken = res.newStartPageToken;
         if (pageToken) {
-          getChanges(drive, pageToken, newStartPageToken, results);
+          childHelper(pageToken, results);
         } else {
-          resolve({
-            items: res.items,
+          callback({
+            items: results,
             newStartPageToken,
           })
         }
       }
     });
-  });
+  }
+  childHelper(token, []);
 }
 
 function applyChange(change) {
@@ -220,25 +236,9 @@ function applyChange(change) {
           resolve();
       })
     } else if (change.file) {
-      fs.writeFile(filename, (err) => {
-        downloadFile(drive, changes.fileId, filename);
-        if (err)
-          reject(err)
-        else
-          resolve()
-      })
+      downloadFile(drive, changes.fileId, filename).then(() => resolve()).catch((err) => reject(err));
+    } else {
+      reject(`no change to apply`)
     }
   });
-}
-
-const updateInterval = 5; // dev only
-
-function trackChanges(drive) {
-  let token = '';
-  setInterval(async () => {
-    const changes = await getChanges(drive, '', token, []);
-    token = changes.newStartPageToken;
-    await Promise.all(changes.items.map(change => applyChange(change)
-      .catch(err => console.error(`unable to apply changes to ${file.fileId}: ${err}`))))
-  }, updateInterval);
 }
