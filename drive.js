@@ -175,23 +175,21 @@ function downloadFile(drive, fileId, filename) {
 
 // changes // TODO change to watching ??
 
-const updateInterval = 1000 * 50; // dev only
+const updateInterval = 1000 * 1000; // dev only
 
 function trackChanges(drive) {
-  setInterval(() => {
-    getChanges(drive, applyChanges);
-  }, updateInterval);
+  getChanges(drive, applyChanges);
+  // setInterval(() => {
+  // }, updateInterval);
 }
 
 function getChanges(drive, callback) {
   function childHelper(pageToken, results) {
-    drive.changes.list({
-      pageToken
-    }, function (err, res) {
+    function childHelperCallback(err, res) {
       if (err) {
-        return console.error('The API list returned an error: ' + err);
+        return console.error('The API change returned an error: ' + err);
       } else {
-        results = results.concat(res.items);
+        results = results.concat(res.data.items);
         pageToken = res.nextPageToken;
         if (pageToken) {
           childHelper(pageToken, results);
@@ -199,33 +197,49 @@ function getChanges(drive, callback) {
           callback(results)
         }
       }
-    });
+    }
+    if (pageToken) {
+      drive.changes.list({
+        pageToken
+      }, childHelperCallback);
+    } else {
+      drive.changes.list(childHelperCallback);
+    }
   }
   childHelper('', []);
 }
 
-async function applyChanges(changes) {
+function applyChanges(changes) {
   if (changes) {
-    await Promise.all(changes.map((change) => applyChange(change).catch(err => console.error(`unable to apply changes: ${err}`))));
+    fs.readdir(essaysPath, async (err, files) => {
+      if (err) {
+        return console.error('unable to list essay files')
+      } else {
+        await Promise.all(changes.map((change) => applyChange(change, files).catch(err => console.error(`unable to apply changes: ${err}`))));
+      }
+    })
   } else {
     console.error(`no changes found!`);
   }
 }
 
-function applyChange(change) {
+function applyChange(change, files) {
   return new Promise((resolve, reject) => {
-    const filename = join(essaysPath, `${changes.fileId}.txt`);
-    if (change.deleted) {
-      fs.unlink(filename, (err) => {
-        if (err)
-          reject(err);
-        else
-          resolve();
-      })
-    } else if (change.file) {
-      downloadFile(drive, changes.fileId, filename).then(() => resolve()).catch((err) => reject(err));
-    } else {
-      reject(`no change to apply`)
+    const name = `${change.fileId}.txt`;
+    if (files.includes(name)) {
+      const filename = join(essaysPath, name);
+      if (change.deleted) {
+        fs.unlink(filename, (err) => {
+          if (err)
+            reject(err);
+          else
+            resolve();
+        })
+      } else if (change.file) {
+        downloadFile(drive, change.fileId, filename).then(() => resolve()).catch((err) => reject(err));
+      } else {
+        reject(`no change to apply`)
+      }
     }
   });
 }
