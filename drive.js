@@ -101,23 +101,6 @@ function getEssaysAndTrackChanges(auth) {
   trackChanges(drive)
 }
 
-const updateInterval = 1000 * 50; // dev only
-
-async function trackChanges(drive) {
-  let token = '';
-  setInterval(async () => {
-    getChanges(drive, token, applyChanges);
-  }, updateInterval);
-}
-
-async function applyChanges(changes) {
-  if (changes) {
-    await Promise.all(changes.map((change) => applyChange(change).catch(err => console.error(`unable to apply changes to ${file.fileId}: ${err}`))));
-  } else {
-    console.error(`no changes found!`);
-  }
-}
-
 function getEssays(drive) {
   if (!secrets || !secrets.folderId) {
     console.error(`folderId not found`);
@@ -126,6 +109,22 @@ function getEssays(drive) {
       if (err || files.length === 0)
         retrieveAllEssaysInFolder(drive, secrets.folderId, sendEssays);
     });
+  }
+}
+
+async function sendEssays(drive, files) {
+  if (files) {
+    await Promise.all(
+      files
+      .map((file) => {
+        downloadFile(drive, file.id, join(essaysPath, `${file.id}.txt`))
+          .catch(err => {
+            console.error('Error fetching file', err);
+          })
+      })
+    )
+  } else {
+    console.error('no files found');
   }
 }
 
@@ -157,6 +156,8 @@ function retrieveAllEssaysInFolder(drive, folderId, callback) {
   retrievePageOfChildren('', []);
 }
 
+// shared
+
 function downloadFile(drive, fileId, filename) {
   return new Promise((resolve, reject) => {
     const dest = fs.createWriteStream(filename);
@@ -184,20 +185,15 @@ function downloadFile(drive, fileId, filename) {
   });
 }
 
-async function sendEssays(drive, files) {
-  if (files) {
-    await Promise.all(
-      files
-      .map((file) => {
-        downloadFile(drive, file.id, join(essaysPath, `${file.id}.txt`))
-          .catch(err => {
-            console.error('Error fetching file', err);
-          })
-      })
-    )
-  } else {
-    console.error('no files found');
-  }
+// changes //
+
+const updateInterval = 1000 * 50; // dev only
+
+async function trackChanges(drive) {
+  let token = '';
+  setInterval(async () => {
+    getChanges(drive, token, applyChanges);
+  }, updateInterval);
 }
 
 function getChanges(drive, token, callback) {
@@ -223,6 +219,17 @@ function getChanges(drive, token, callback) {
     });
   }
   childHelper(token, []);
+}
+
+async function applyChanges({
+  items: changes,
+  newStartPageToken
+}) {
+  if (changes) {
+    await Promise.all(changes.map((change) => applyChange(change).catch(err => console.error(`unable to apply changes to ${file.fileId}: ${err}`))));
+  } else {
+    console.error(`no changes found!`);
+  }
 }
 
 function applyChange(change) {
