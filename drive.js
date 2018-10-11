@@ -178,9 +178,9 @@ function downloadFile(drive, fileId, filename) {
 const updateInterval = 1000 * 1000; // dev only
 
 function trackChanges(drive) {
-  getChanges(drive, applyChanges);
-  // setInterval(() => {
-  // }, updateInterval);
+  setInterval(() => {
+    getChanges(drive, applyChanges);
+  }, updateInterval);
 }
 
 function getChanges(drive, callback) {
