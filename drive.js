@@ -76,22 +76,8 @@ function getAccessToken(oAuth2Client, callback) {
   });
 }
 
-const orderByOptions = [
-  'createdDate',
-  'folder',
-  'lastViewedByMeDate',
-  'modifiedByMeDate',
-  'modifiedDate',
-  'quotaBytesUsed',
-  'recency',
-  'sharedWithMeDate',
-  'starred',
-  'title'
-];
+// end of authorization
 
-const essaysPath = './essays';
-
-// TODO change to watching ??
 function getEssaysAndTrackChanges(auth) {
   const drive = google.drive({
     version: 'v2',
@@ -100,6 +86,8 @@ function getEssaysAndTrackChanges(auth) {
   getEssays(drive);
   trackChanges(drive)
 }
+
+const essaysPath = './essays';
 
 function getEssays(drive) {
   if (!secrets || !secrets.folderId) {
@@ -129,7 +117,7 @@ async function sendEssays(drive, files) {
 }
 
 const options = {
-  orderBy: `${orderByOptions[0]} desc`,
+  orderBy: `createdDate desc`,
   maxResults: 12, // dev only
 }
 
@@ -185,48 +173,40 @@ function downloadFile(drive, fileId, filename) {
   });
 }
 
-// changes //
+// changes // TODO change to watching ??
 
 const updateInterval = 1000 * 50; // dev only
 
-async function trackChanges(drive) {
-  let token = '';
-  setInterval(async () => {
-    getChanges(drive, token, applyChanges);
+function trackChanges(drive) {
+  setInterval(() => {
+    getChanges(drive, applyChanges);
   }, updateInterval);
 }
 
-function getChanges(drive, token, callback) {
+function getChanges(drive, callback) {
   function childHelper(pageToken, results) {
     drive.changes.list({
-      pageToken: pageToken
+      pageToken
     }, function (err, res) {
       if (err) {
         return console.error('The API list returned an error: ' + err);
       } else {
         results = results.concat(res.items);
         pageToken = res.nextPageToken;
-        newStartPageToken = res.newStartPageToken;
         if (pageToken) {
           childHelper(pageToken, results);
         } else {
-          callback({
-            items: results,
-            newStartPageToken,
-          })
+          callback(results)
         }
       }
     });
   }
-  childHelper(token, []);
+  childHelper('', []);
 }
 
-async function applyChanges({
-  items: changes,
-  newStartPageToken
-}) {
+async function applyChanges(changes) {
   if (changes) {
-    await Promise.all(changes.map((change) => applyChange(change).catch(err => console.error(`unable to apply changes to ${file.fileId}: ${err}`))));
+    await Promise.all(changes.map((change) => applyChange(change).catch(err => console.error(`unable to apply changes: ${err}`))));
   } else {
     console.error(`no changes found!`);
   }
