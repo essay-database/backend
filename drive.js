@@ -7,6 +7,7 @@ const secrets = require('./secrets.json');
 const {
   join
 } = require('path');
+const assert = require('assert');
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
@@ -96,12 +97,12 @@ function getEssaysAndTrackChanges(auth) {
 }
 
 function getEssays() {
-  if (!secrets || !secrets.folderId) {
-    console.error(`folderId not found`);
+  if (!secrets || !secrets.essaysFolderID) {
+    console.error(`essaysFolderID not found`);
   } else {
     fs.readdir(essaysPath, (err, files) => {
       if (err || files.length === 0)
-        retrieveAllEssaysInFolder(secrets.folderId, sendEssays);
+        retrieveAllEssaysInFolder(secrets.essaysFolderID, sendEssays);
     });
   }
 }
@@ -177,15 +178,29 @@ function downloadFile(fileId, filename) {
 // create new document
 
 function getNewID() {
-  DRIVE
+  return new Promise((resolve, reject) => {
+    DRIVE.files.generateIds((err, res) => {
+      if (err) return reject(err)
+      else {
+        resolve(res.data.ids[0]);
+      }
+    })
+  });
 }
 
 function createMetaData(metaData) {
+  if (secrets && secrets.detailsFileID) {
 
+  } else {
+    console.error('could not file detailsFileID');
+  }
 }
 
-function createDocument(filePath, metaData) {
-  const id = getNewID();
+async function createDocument(filePath, metaData) {
+  const id = await getNewID().catch(err => {
+    console.error(err);
+    return getRandomID();
+  });
   const fileMetadata = {
     'title': id,
     'mimeType': 'application/vnd.google-apps.document'
@@ -200,10 +215,10 @@ function createDocument(filePath, metaData) {
     fields: 'id'
   }, function (err, file) {
     if (err) {
-      // Handle error
       console.error(err);
     } else {
       console.log('File Id:', file.id);
+      assert.equal(file.id, id);
     }
   });
 }

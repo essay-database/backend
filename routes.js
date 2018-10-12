@@ -20,8 +20,7 @@ const ESSAYS_PATH = './essays';
 const STATUS_OK = 200;
 
 ROUTER.post('/upload', (req, res, next) => {
-  // TODO convert text to readstream ??
-  createDocument(req.body.filename, req.body.text, req.body.meta).then(() => {
+  createDocument(req.body.filename, req.body.meta).then(() => {
     res.status(STATUS_OK).send({
       success: true
     })
