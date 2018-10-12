@@ -2,8 +2,7 @@
 const express = require('express');
 const {
   readFile,
-  readdir,
-  writeFile
+  readdir
 } = require('fs');
 const {
   join
@@ -16,37 +15,37 @@ const {
   createError
 } = require('./shared');
 
-const router = express.Router();
-const essaysPath = './essays';
-const statusOk = 200;
-let counter;
+const ROUTER = express.Router();
+const ESSAYS_PATH = './essays';
+const STATUS_OK = 200;
 
-router.post('/upload', (req, res, next) => {
+ROUTER.post('/upload', (req, res, next) => {
+  // TODO convert text to readstream ??
   createDocument(req.body.filename, req.body.text, req.body.meta).then(() => {
-    res.status(statusOk).send({
+    res.status(STATUS_OK).send({
       success: true
     })
-  }).catch(err => createError(err))
+  }).catch(err => createError(400, err.message, next));
 })
 
-router.get('/', (req, res, next) => {
-  readdir(essaysPath, async (err, files) => {
+ROUTER.get('/', (req, res, next) => {
+  readdir(ESSAYS_PATH, async (err, files) => {
     if (err) return createError(500, err.message, next);
     files = files.filter((name) => name.endsWith('.txt'));
-    const essays = await Promise.all(files.map(name => readFileWrapper(join(essaysPath, name)))).catch(err => createError(404, err.message, next));
-    res.status(statusOk)
+    const essays = await Promise.all(files.map(name => readFileWrapper(join(ESSAYS_PATH, name)))).catch(err => createError(404, err.message, next));
+    res.status(STATUS_OK)
       .json(essays);
   })
 });
 
-router.get('/:id', async (req, res, next) => {
+ROUTER.get('/:id', async (req, res, next) => {
   let data;
   try {
-    data = await readFileWrapper(join(essaysPath, `${req.params.id}.txt`))
+    data = await readFileWrapper(join(ESSAYS_PATH, `${req.params.id}.txt`))
   } catch (error) {
     return createError(404, error.message, next);
   }
-  res.status(statusOk)
+  res.status(STATUS_OK)
     .send({
       essay: data
     })
@@ -65,16 +64,4 @@ function readFileWrapper(filename) {
   })
 }
 
-// function writeFileWrapper(filename) {
-//   return new Promise((resolve, reject) => {
-//     writeFile(filename, data, (err) => {
-//       if (err) {
-//         reject(new Error('unable to write ${filename}'));
-//       } else {
-//         resolve(filename);
-//       }
-//     })
-//   });
-// }
-
-module.exports = router;
+module.exports = ROUTER;
