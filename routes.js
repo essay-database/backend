@@ -19,12 +19,13 @@ const router = express.Router();
 const essaysPath = './essays';
 const statusOk = 200;
 
-function getId(params) {
-
-}
-
 router.post('/upload', (req, res, next) => {
-
+  createDocument(req.body.data).then(() => {
+    res.status(statusOk).send({
+      msg: 'document created',
+      success: true
+    })
+  }).catch(err => createError(err))
 })
 
 router.get('/', (req, res, next) => {
