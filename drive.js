@@ -84,7 +84,7 @@ function getEssaysAndTrackChanges(auth) {
     auth
   });
   getEssays(drive);
-  trackChanges(drive)
+  trackChanges(drive);
 }
 
 const essaysPath = './essays';
@@ -175,12 +175,12 @@ function downloadFile(drive, fileId, filename) {
 
 // changes // TODO change to watching ??
 
-const updateInterval = 1000 * 1000; // dev only
+const updateInterval = 1000 * 2; // dev only
 
 function trackChanges(drive) {
-  setInterval(() => {
-    getChanges(drive, applyChanges);
-  }, updateInterval);
+  getChanges(drive, applyChanges);
+  // setInterval(() => {
+  // }, updateInterval);
 }
 
 function getChanges(drive, callback) {
@@ -240,6 +240,43 @@ function applyChange(change, files) {
       } else {
         reject(`no change to apply`)
       }
+    } else {
+      console.log(`${name} not in ${essaysPath}`);
     }
   });
+}
+
+
+// create new document
+
+function getNewID(params) {
+
+}
+
+function createDocument(params) {
+  const id = getNewID()
+  const fileMetadata = {
+    'title': id,
+    'mimeType': 'application/vnd.google-apps.document'
+  };
+  const media = {
+    mimeType: 'text/csv',
+    body: fs.createReadStream('files/report.csv')
+  };
+  drive.files.insert({
+    resource: fileMetadata,
+    media: media,
+    fields: 'id'
+  }, function (err, file) {
+    if (err) {
+      // Handle error
+      console.error(err);
+    } else {
+      console.log('File Id:', file.id);
+    }
+  });
+}
+
+module.exports = {
+  createDocument
 }

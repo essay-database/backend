@@ -9,12 +9,23 @@ const {
 } = require('path');
 // modules
 const {
+  createDocument
+} = require('./drive');
+const {
   createError
 } = require('./shared');
 
 const router = express.Router();
 const essaysPath = './essays';
 const statusOk = 200;
+
+function getId(params) {
+
+}
+
+router.post('/upload', (req, res, next) => {
+
+})
 
 router.get('/', (req, res, next) => {
   readdir(essaysPath, async (err, files) => {
