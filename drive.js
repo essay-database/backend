@@ -11,6 +11,7 @@ const {
 // If modifying these scopes, delete token.json.
 const SCOPES = ['https://www.googleapis.com/auth/drive'];
 const TOKEN_PATH = 'token.json';
+let DRIVE;
 
 // Load client secrets from a local file.
 fs.readFile('credentials.json', (err, content) => {
@@ -77,35 +78,40 @@ function getAccessToken(oAuth2Client, callback) {
 }
 
 // end of authorization
+const essaysPath = './essays';
+const updateInterval = 1000 * 20; // dev only
+const options = {
+  orderBy: `createdDate desc`,
+  maxResults: 12, // dev only
+}
 
 function getEssaysAndTrackChanges(auth) {
-  const drive = google.drive({
+  DRIVE = google.drive({
     version: 'v2',
     auth
   });
-  getEssays(drive);
-  trackChanges(drive);
+  getEssays();
+  trackChanges();
+
 }
 
-const essaysPath = './essays';
-
-function getEssays(drive) {
+function getEssays() {
   if (!secrets || !secrets.folderId) {
     console.error(`folderId not found`);
   } else {
     fs.readdir(essaysPath, (err, files) => {
       if (err || files.length === 0)
-        retrieveAllEssaysInFolder(drive, secrets.folderId, sendEssays);
+        retrieveAllEssaysInFolder(secrets.folderId, sendEssays);
     });
   }
 }
 
-async function sendEssays(drive, files) {
+async function sendEssays(files) {
   if (files) {
     await Promise.all(
       files
       .map((file) => {
-        downloadFile(drive, file.id, join(essaysPath, `${file.id}.txt`))
+        downloadFile(file.id, join(essaysPath, `${file.id}.txt`))
           .catch(err => {
             console.error('Error fetching file', err);
           })
@@ -116,14 +122,9 @@ async function sendEssays(drive, files) {
   }
 }
 
-const options = {
-  orderBy: `createdDate desc`,
-  maxResults: 12, // dev only
-}
-
-function retrieveAllEssaysInFolder(drive, folderId, callback) {
+function retrieveAllEssaysInFolder(folderId, callback) {
   function retrievePageOfChildren(pageToken, result) {
-    drive.children.list({
+    DRIVE.children.list({
         folderId: folderId,
         orderBy: options.orderBy,
         maxResults: options.maxResults,
@@ -136,7 +137,7 @@ function retrieveAllEssaysInFolder(drive, folderId, callback) {
         if (nextPageToken) {
           retrievePageOfChildren(nextPageToken, result);
         } else {
-          callback(drive, result);
+          callback(result);
         }
       }
     );
@@ -146,10 +147,10 @@ function retrieveAllEssaysInFolder(drive, folderId, callback) {
 
 // shared
 
-function downloadFile(drive, fileId, filename) {
+function downloadFile(fileId, filename) {
   return new Promise((resolve, reject) => {
     const dest = fs.createWriteStream(filename);
-    drive.files
+    DRIVE.files
       .export({
         fileId: fileId,
         mimeType: 'text/plain'
@@ -174,16 +175,13 @@ function downloadFile(drive, fileId, filename) {
 }
 
 // changes // TODO change to watching ??
-
-const updateInterval = 1000 * 2; // dev only
-
-function trackChanges(drive) {
-  getChanges(drive, applyChanges);
-  // setInterval(() => {
-  // }, updateInterval);
+function trackChanges() {
+  setInterval(() => {
+    getChanges(applyChanges);
+  }, updateInterval);
 }
 
-function getChanges(drive, callback) {
+function getChanges(callback) {
   function childHelper(pageToken, results) {
     function childHelperCallback(err, res) {
       if (err) {
@@ -199,11 +197,11 @@ function getChanges(drive, callback) {
       }
     }
     if (pageToken) {
-      drive.changes.list({
+      DRIVE.changes.list({
         pageToken
       }, childHelperCallback);
     } else {
-      drive.changes.list(childHelperCallback);
+      DRIVE.changes.list(childHelperCallback);
     }
   }
   childHelper('', []);
@@ -236,7 +234,7 @@ function applyChange(change, files) {
             resolve();
         })
       } else if (change.file) {
-        downloadFile(drive, change.fileId, filename).then(() => resolve()).catch((err) => reject(err));
+        downloadFile(change.fileId, filename).then(() => resolve()).catch((err) => reject(err));
       } else {
         reject(`no change to apply`)
       }
@@ -246,24 +244,27 @@ function applyChange(change, files) {
   });
 }
 
-
 // create new document
 
-function getNewID(params) {
+function getNewID() {
+  DRIVE
+}
+
+function createMetaData(metaData) {
 
 }
 
-function createDocument(params) {
-  const id = getNewID()
+function createDocument(filePath, metaData) {
+  const id = getNewID();
   const fileMetadata = {
     'title': id,
     'mimeType': 'application/vnd.google-apps.document'
   };
   const media = {
-    mimeType: 'text/csv',
-    body: fs.createReadStream('files/report.csv')
+    mimeType: 'text/plain',
+    body: fs.createReadStream(filePath)
   };
-  drive.files.insert({
+  DRIVE.files.insert({
     resource: fileMetadata,
     media: media,
     fields: 'id'

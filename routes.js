@@ -2,7 +2,8 @@
 const express = require('express');
 const {
   readFile,
-  readdir
+  readdir,
+  writeFile
 } = require('fs');
 const {
   join
@@ -18,11 +19,11 @@ const {
 const router = express.Router();
 const essaysPath = './essays';
 const statusOk = 200;
+let counter;
 
 router.post('/upload', (req, res, next) => {
-  createDocument(req.body.data).then(() => {
+  createDocument(req.body.filename, req.body.text, req.body.meta).then(() => {
     res.status(statusOk).send({
-      msg: 'document created',
       success: true
     })
   }).catch(err => createError(err))
@@ -58,10 +59,22 @@ function readFileWrapper(filename) {
         reject(new Error(`unable to read ${filename}`));
       else
         resolve({
-          content: data.length
+          content: data
         });
     });
   })
 }
+
+// function writeFileWrapper(filename) {
+//   return new Promise((resolve, reject) => {
+//     writeFile(filename, data, (err) => {
+//       if (err) {
+//         reject(new Error('unable to write ${filename}'));
+//       } else {
+//         resolve(filename);
+//       }
+//     })
+//   });
+// }
 
 module.exports = router;
