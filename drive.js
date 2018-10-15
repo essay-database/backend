@@ -80,7 +80,6 @@ function getAccessToken(oAuth2Client, callback) {
 
 // end of authorization
 const essaysPath = './essays';
-const updateInterval = 1000 * 20; // dev only
 const options = {
   orderBy: `createdDate desc`,
   maxResults: 12, // dev only
@@ -92,8 +91,6 @@ function getEssaysAndTrackChanges(auth) {
     auth
   });
   getEssays();
-  trackChanges();
-
 }
 
 function getEssays() {
@@ -117,7 +114,8 @@ async function sendEssays(files) {
             console.error('Error fetching file', err);
           })
       })
-    )
+    );
+    watchFiles(files);
   } else {
     console.error('no files found');
   }
@@ -222,6 +220,13 @@ async function createDocument(filePath, metaData) {
     }
   });
 }
+
+
+// watch Files
+function watchFiles(files) {
+
+}
+// exports
 
 module.exports = {
   createDocument
