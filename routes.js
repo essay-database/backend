@@ -25,7 +25,7 @@ ROUTER.post('/upload', (req, res, next) => {
       success: true
     })
   }).catch(err => createError(400, err.message, next));
-})
+});
 
 ROUTER.get('/', (req, res, next) => {
   readdir(ESSAYS_PATH, async (err, files) => {

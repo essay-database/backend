@@ -115,7 +115,7 @@ async function sendEssays(files) {
           })
       })
     );
-    watchFiles(files);
+    watchFiles(files.map(f => f.id));
   } else {
     console.error('no files found');
   }
@@ -221,11 +221,32 @@ async function createDocument(filePath, metaData) {
   });
 }
 
-
 // watch Files
-function watchFiles(files) {
 
+function watchFile(fileId, channelId, channelType, channelAddress) {
+  var resource = {
+    'id': channelId,
+    'type': channelType,
+    'address': channelAddress
+  };
+  var request = gapi.client.drive.files.watch({
+    'fileId': fileId,
+    'resource': resource
+  });
+  request.execute(function (channel) {
+    console.log(channel);
+  });
 }
+
+function watchFiles(fileIds) {
+  const channelId = getID();
+  const channelType = 'web_hook';
+  const channelAddress = "/updates";
+  fileIds.forEach(id => {
+    watchFile(id, channelId, channelType, channelAddress);
+  });
+}
+
 // exports
 
 module.exports = {
