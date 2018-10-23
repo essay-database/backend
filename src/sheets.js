@@ -100,3 +100,16 @@ function listMajors(auth) {
         }
     });
 }
+
+
+function addEssay(params) {
+
+}
+
+function getEssays(params) {
+
+}
+
+function getEssay(params) {
+
+}

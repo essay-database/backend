@@ -195,7 +195,7 @@ function createMetaData(metaData) {
   }
 }
 
-async function createDocument(filePath, metaData) {
+async function createEssay(filePath, metaData) {
   const id = await getNewID().catch(err => {
     console.error(err);
     return getRandomID();
@@ -251,5 +251,5 @@ async function createDocument(filePath, metaData) {
 // exports
 
 module.exports = {
-  createDocument
+  createEssay
 }
