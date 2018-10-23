@@ -10,12 +10,14 @@ const {
 const assert = require('assert');
 
 // If modifying these scopes, delete token.json.
-const SCOPES = [];
-const TOKEN_PATH = 'token.json';
+const SCOPES = ['https://www.googleapis.com/auth/drive'];
+
+const TOKEN_PATH = join('credentials', 'token.json');
+const CREDENTIALS_PATH = join('credentials', 'credentials.json');
 let DRIVE;
 
 // Load client secrets from a local file.
-fs.readFile('credentials.json', (err, content) => {
+fs.readFile(CREDENTIALS_PATH, (err, content) => {
   if (err) return console.error('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Drive API.
   authorize(JSON.parse(content), getEssays);
