@@ -1,10 +1,9 @@
 const initialize = require('./authorization');
 const {
-    getEssays: getEssaysDetails
+    getEssaysDetails
 } = require('./sheets');
 const {
-    getEssays: getEssaysContent
+    getEssaysContent
 } = require('./drive');
-
 
 initialize([getEssaysContent, getEssaysDetails]);

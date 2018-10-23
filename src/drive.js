@@ -4,7 +4,7 @@ const OPTIONS = {
   maxResults: 12, // dev only
 }
 
-function getEssays(auth) {
+function getEssaysContent(auth) {
   DRIVE = google.drive({
     version: 'v2',
     auth
@@ -21,10 +21,6 @@ function getEssays(auth) {
   }
 }
 
-
-function getEssayDetails(spreadsheetId) {
-
-}
 
 async function sendEssays(files) {
   if (files) {
@@ -94,7 +90,6 @@ function downloadFile(fileId, filename) {
 }
 
 // create new document
-
 function getNewID() {
   return new Promise((resolve, reject) => {
     DRIVE.files.generateIds((err, res) => {
@@ -106,13 +101,13 @@ function getNewID() {
   });
 }
 
-function createMetaData(metaData) {
-  if (secrets && secrets.detailsFileID) {
+// function createMetaData(metaData) {
+//   if (secrets && secrets.detailsFileID) {
 
-  } else {
-    console.error('could not file detailsFileID');
-  }
-}
+//   } else {
+//     console.error('could not file detailsFileID');
+//   }
+// }
 
 async function createEssay(filePath, metaData) {
   const id = await getNewID().catch(err => {
@@ -171,5 +166,5 @@ async function createEssay(filePath, metaData) {
 
 module.exports = {
   createEssay,
-  getEssays
+  getEssaysContent
 }

@@ -3,7 +3,7 @@ const {
     DETAILS_RANGE
 } = require('./secrets.json');
 
-function getEssays(auth) {
+function getEssaysDetails(auth) {
     const sheets = google.sheets({
         version: 'v4',
         auth
@@ -25,5 +25,5 @@ function getEssays(auth) {
 }
 
 module.exports = {
-    getEssays
+    getEssaysDetails
 }
