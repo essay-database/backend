@@ -143,7 +143,6 @@ function retrieveAllEssaysInFolder(folderId, callback) {
   };
   retrievePageOfChildren('', []);
 }
-
 // shared
 
 function downloadFile(fileId, filename) {
