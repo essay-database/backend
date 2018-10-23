@@ -10,7 +10,7 @@ const {
 const assert = require('assert');
 
 // If modifying these scopes, delete token.json.
-const SCOPES = ['https://www.googleapis.com/auth/drive'];
+const SCOPES = [];
 const TOKEN_PATH = 'token.json';
 let DRIVE;
 
