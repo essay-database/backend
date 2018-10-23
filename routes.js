@@ -10,7 +10,7 @@ const {
 // modules
 const {
   createDocument
-} = require('./drive');
+} = require('./docs');
 const {
   createError
 } = require('./shared');

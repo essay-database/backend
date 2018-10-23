@@ -18,7 +18,7 @@ let DRIVE;
 fs.readFile('credentials.json', (err, content) => {
   if (err) return console.error('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Drive API.
-  authorize(JSON.parse(content), getEssaysAndTrackChanges);
+  authorize(JSON.parse(content), getEssays);
 });
 
 /**
@@ -85,23 +85,26 @@ const options = {
   maxResults: 12, // dev only
 }
 
-function getEssaysAndTrackChanges(auth) {
+function getEssays(auth) {
   DRIVE = google.drive({
     version: 'v2',
     auth
   });
-  getEssays();
-}
-
-function getEssays() {
   if (!secrets || !secrets.essaysFolderID) {
     console.error(`essaysFolderID not found`);
   } else {
     fs.readdir(essaysPath, (err, files) => {
-      if (err || files.length === 0)
-        retrieveAllEssaysInFolder(secrets.essaysFolderID, sendEssays);
+      if (err || files.length === 0) {
+        retrieveAllEssays(secrets.essaysFolderID, sendEssays);
+      }
+      getEssayDetails();
     });
   }
+}
+
+
+function getEssayDetails(spreadsheetId) {
+
 }
 
 async function sendEssays(files) {
@@ -121,7 +124,7 @@ async function sendEssays(files) {
   }
 }
 
-function retrieveAllEssaysInFolder(folderId, callback) {
+function retrieveAllEssays(folderId, callback) {
   function retrievePageOfChildren(pageToken, result) {
     DRIVE.children.list({
         folderId: folderId,
@@ -143,7 +146,6 @@ function retrieveAllEssaysInFolder(folderId, callback) {
   };
   retrievePageOfChildren('', []);
 }
-// shared
 
 function downloadFile(fileId, filename) {
   return new Promise((resolve, reject) => {
@@ -222,29 +224,29 @@ async function createDocument(filePath, metaData) {
 
 // watch Files
 
-function watchFile(fileId, channelId, channelType, channelAddress) {
-  var resource = {
-    'id': channelId,
-    'type': channelType,
-    'address': channelAddress
-  };
-  var request = gapi.client.drive.files.watch({
-    'fileId': fileId,
-    'resource': resource
-  });
-  request.execute(function (channel) {
-    console.log(channel);
-  });
-}
+// function watchFile(fileId, channelId, channelType, channelAddress) {
+//   var resource = {
+//     'id': channelId,
+//     'type': channelType,
+//     'address': channelAddress
+//   };
+//   var request = gapi.client.drive.files.watch({
+//     'fileId': fileId,
+//     'resource': resource
+//   });
+//   request.execute(function (channel) {
+//     console.log(channel);
+//   });
+// }
 
-function watchFiles(fileIds) {
-  const channelId = getID();
-  const channelType = 'web_hook';
-  const channelAddress = "/updates";
-  fileIds.forEach(id => {
-    watchFile(id, channelId, channelType, channelAddress);
-  });
-}
+// function watchFiles(fileIds) {
+//   const channelId = getID();
+//   const channelType = 'web_hook';
+//   const channelAddress = "/updates";
+//   fileIds.forEach(id => {
+//     watchFile(id, channelId, channelType, channelAddress);
+//   });
+// }
 
 // exports
 
