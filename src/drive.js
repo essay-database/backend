@@ -1,5 +1,5 @@
-const essaysPath = './essays';
-const options = {
+const ESSAYS_PATH = './essays';
+const OPTIONS = {
   orderBy: `createdDate desc`,
   maxResults: 12, // dev only
 }
@@ -12,7 +12,7 @@ function getEssays(auth) {
   if (!secrets || !secrets.essaysFolderID) {
     console.error(`essaysFolderID not found`);
   } else {
-    fs.readdir(essaysPath, (err, files) => {
+    fs.readdir(ESSAYS_PATH, (err, files) => {
       if (err || files.length === 0) {
         retrieveAllEssays(secrets.essaysFolderID, sendEssays);
       }
@@ -31,7 +31,7 @@ async function sendEssays(files) {
     await Promise.all(
       files
       .map((file) => {
-        downloadFile(file.id, join(essaysPath, `${file.id}.txt`))
+        downloadFile(file.id, join(ESSAYS_PATH, `${file.id}.txt`))
           .catch(err => {
             console.error('Error fetching file', err);
           })
@@ -47,8 +47,8 @@ function retrieveAllEssays(folderId, callback) {
   function retrievePageOfChildren(pageToken, result) {
     DRIVE.children.list({
         folderId: folderId,
-        orderBy: options.orderBy,
-        maxResults: options.maxResults,
+        orderBy: OPTIONS.orderBy,
+        maxResults: OPTIONS.maxResults,
         pageToken
       },
       (err, res) => {
@@ -170,5 +170,6 @@ async function createEssay(filePath, metaData) {
 // exports
 
 module.exports = {
-  createEssay
+  createEssay,
+  getEssays
 }

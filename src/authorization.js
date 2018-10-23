@@ -11,16 +11,15 @@ const {
 	SCOPES
 } = require('./secrets.json');
 
-
 const TOKEN_PATH = join('credentials', 'token.json');
 const CREDENTIALS_PATH = join('credentials', 'credentials.json');
 
 // Load client secrets from a local file.
-function initialize(callback) {
+function initialize(callbacks) {
 	fs.readFile(CREDENTIALS_PATH, (err, content) => {
-		if (err) return console.log('Error loading client secret file:', err);
+		if (err) return console.error('Error loading client secret file:', err);
 		// Authorize a client with credentials, then call the Google Sheets API.
-		authorize(JSON.parse(content), callback);
+		authorize(JSON.parse(content), callbacks);
 	});
 }
 
@@ -28,9 +27,9 @@ function initialize(callback) {
  * Create an OAuth2 client with the given credentials, and then execute the
  * given callback function.
  * @param {Object} credentials The authorization client credentials.
- * @param {function} callback The callback to call with the authorized client.
+ * @param {function} callbacks The callback to call with the authorized client.
  */
-function authorize(credentials, callback) {
+function authorize(credentials, callbacks) {
 	const {
 		client_secret,
 		client_id,
@@ -40,9 +39,11 @@ function authorize(credentials, callback) {
 		client_id, client_secret, redirect_uris[0]);
 	// Check if we have previously stored a token.
 	fs.readFile(TOKEN_PATH, (err, token) => {
-		if (err) return getNewToken(oAuth2Client, callback);
+		if (err) return getNewToken(oAuth2Client, callbacks);
 		oAuth2Client.setCredentials(JSON.parse(token));
-		callback(oAuth2Client);
+		callbacks.forEach(callback => {
+			callback(oAuth2Client);
+		});
 	});
 }
 
@@ -50,9 +51,9 @@ function authorize(credentials, callback) {
  * Get and store new token after prompting for user authorization, and then
  * execute the given callback with the authorized OAuth2 client.
  * @param {google.auth.OAuth2} oAuth2Client The OAuth2 client to get token for.
- * @param {getEventsCallback} callback The callback for the authorized client.
+ * @param {getEventsCallback} callbacks The callback for the authorized client.
  */
-function getNewToken(oAuth2Client, callback) {
+function getNewToken(oAuth2Client, callbacks) {
 	const authUrl = oAuth2Client.generateAuthUrl({
 		access_type: 'offline',
 		scope: SCOPES,
@@ -72,7 +73,9 @@ function getNewToken(oAuth2Client, callback) {
 				if (err) console.error(err);
 				console.log('Token stored to', TOKEN_PATH);
 			});
-			callback(oAuth2Client);
+			callbacks.forEach(callback => {
+				callback(oAuth2Client);
+			});
 		});
 	});
 }

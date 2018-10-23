@@ -12,7 +12,7 @@ function getEssays(auth) {
         spreadsheetId: DETAILS_SHEETID,
         range: DETAILS_RANGE,
     }, (err, res) => {
-        if (err) return console.log('The API returned an error: ' + err);
+        if (err) return console.error('The API returned an error: ' + err);
         const rows = res.data.values;
         if (rows.length) {
             rows.map((row) => {
