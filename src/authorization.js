@@ -80,6 +80,4 @@ function getNewToken(oAuth2Client, callbacks) {
 	});
 }
 
-module.exports = {
-	initialize
-}
+module.exports = initialize;

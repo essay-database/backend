@@ -1,4 +1,3 @@
-// packages
 const express = require('express');
 const {
   readFile,
@@ -7,7 +6,6 @@ const {
 const {
   join
 } = require('path');
-// modules
 const {
   createEssay
 } = require('./drive');
