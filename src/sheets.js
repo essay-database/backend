@@ -80,15 +80,6 @@ function getNewToken(oAuth2Client, callback) {
     });
 }
 
-
-function createEssay(params) {
-
-}
-
-function getEssay(params) {
-
-}
-
 function getEssays(auth) {
     const sheets = google.sheets({
         version: 'v4',
@@ -111,6 +102,5 @@ function getEssays(auth) {
 }
 
 module.exports = {
-    getEssays,
-    createEssay
+    getEssays
 }
