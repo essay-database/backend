@@ -5,7 +5,7 @@ const ESSAYS_PATH = '../essays';
 const OPTIONS = {
   orderBy: `createdDate desc`,
   maxResults: 12, // dev only
-}
+};
 
 function getEssaysContent(auth) {
   const drive = google.drive({
@@ -13,22 +13,6 @@ function getEssaysContent(auth) {
     auth
   });
   retrieveAllEssays(drive, ESSAY_FOLDERID, downloadFiles);
-}
-
-async function downloadFiles(files) {
-  if (files) {
-    await Promise.all(
-      files
-      .map((file) => {
-        downloadFile(file.id, join(ESSAYS_PATH, `${file.id}.txt`))
-          .catch(err => {
-            console.error('Error fetching file', err);
-          })
-      })
-    ).then(res => res.map(console.log))
-  } else {
-    console.error('no files found');
-  }
 }
 
 function retrieveAllEssays(drive, folderId, callback) {
@@ -52,6 +36,22 @@ function retrieveAllEssays(drive, folderId, callback) {
     );
   };
   retrievePageOfChildren('', []);
+}
+
+async function downloadFiles(files) {
+  if (files) {
+    await Promise.all(
+        files
+        .map((file) => {
+          downloadFile(file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+        })
+      ).then(res => res.forEach(console.log))
+      .catch(err => {
+        console.error(err);
+      });
+  } else {
+    console.error('no files found');
+  }
 }
 
 function downloadFile(drive, fileId, filename) {

@@ -7,11 +7,9 @@ const {
 } = require('path');
 const {
   createEssay,
-  getEssay
-} = require('./api');
-const {
+  getEssay,
   createError
-} = require('./shared');
+} = require('./api');
 
 const ROUTER = express.Router();
 const ESSAYS_PATH = './essays';
