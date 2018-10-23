@@ -12,11 +12,7 @@ function getEssaysContent(auth) {
     version: 'v2',
     auth
   });
-  fs.readdir(ESSAYS_PATH, (err, files) => {
-    if (err || files.length === 0) {
-      retrieveAllEssays(drive, ESSAY_FOLDERID, downloadFiles);
-    }
-  });
+  retrieveAllEssays(drive, ESSAY_FOLDERID, downloadFiles);
 }
 
 async function downloadFiles(files) {
@@ -24,13 +20,12 @@ async function downloadFiles(files) {
     await Promise.all(
       files
       .map((file) => {
-        download(file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+        downloadFile(file.id, join(ESSAYS_PATH, `${file.id}.txt`))
           .catch(err => {
             console.error('Error fetching file', err);
           })
       })
-    );
-    // watchFiles(files.map(f => f.id));
+    ).then(res => res.map(console.log))
   } else {
     console.error('no files found');
   }
@@ -59,7 +54,7 @@ function retrieveAllEssays(drive, folderId, callback) {
   retrievePageOfChildren('', []);
 }
 
-function download(drive, fileId, filename) {
+function downloadFile(drive, fileId, filename) {
   return new Promise((resolve, reject) => {
     const dest = fs.createWriteStream(filename);
     drive.files
