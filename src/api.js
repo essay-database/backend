@@ -1,13 +1,32 @@
 const {
 	readFile
 } = require('fs');
+const {
+	ESSAYS_PATH
+} = require('../config.json');
 const authorize = require('./authorization');
 const getEssaysDetails = require('./sheets');
 const getEssaysContent = require('./drive');
 
-// run on load from routes.js
 function initialize() {
 	authorize([getEssaysContent, getEssaysDetails]);
+}
+
+function getEssays() {
+	readdir(ESSAYS_PATH, async (err, files) => {
+		if (err) return createError(500, err.message, next);
+
+		files = files.filter((name) => name.endsWith('.txt'));
+		let essays;
+		try {
+			essays = await Promise.all(files.map(name => getEssay(name)));
+		} catch (err) {
+			return createError(500, err.message, next);
+		}
+		res.status(STATUS_OK)
+			.json(essays);
+	});
+
 }
 
 function getEssay(filename) {
@@ -40,6 +59,7 @@ function createError(status, message, next) {
 module.exports = {
 	getEssay,
 	createEssay,
+	getEssays,
 	createError,
 	initialize
 }

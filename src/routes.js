@@ -1,61 +1,37 @@
 const express = require('express');
 const {
-  readdir
-} = require('fs');
-const {
-  join
-} = require('path');
-const {
-  createEssay,
   getEssay,
+  getEssays,
+  createEssay,
   createError
 } = require('./api');
-const {
-  ESSAYS_PATH
-} = require('../config.json');
 
 const ROUTER = express.Router();
 const STATUS_OK = 200;
 
-ROUTER.get('/', (req, res, next) => {
-  readdir(ESSAYS_PATH, async (err, files) => {
-    if (err) return createError(500, err.message, next);
-    files = files.filter((name) => name.endsWith('.txt'));
-    let essays;
-    try {
-      essays = await Promise.all(files.map(name => getEssay(join(ESSAYS_PATH, name))));
-    } catch (err) {
-      return createError(500, err.message, next);
-    }
-    res.status(STATUS_OK)
-      .json(essays);
-  });
+ROUTER.get('/', async (req, res, next) => {
+  let essays;
+  try {
+    essays = await getEssays();
+  } catch (err) {
+    return createError(404, error.message, next);
+  }
+  res.status(STATUS_OK)
+    .json(essays);
 });
 
 ROUTER.get('/:id', async (req, res, next) => {
-  let data;
+  let essay;
   try {
-    data = await getEssay(join(ESSAYS_PATH, `${req.params.id}.txt`))
+    essay = await getEssay(id);
   } catch (error) {
     return createError(404, error.message, next);
   }
   res.status(STATUS_OK)
-    .send({
-      essay: data
-    });
+    .json(essay);
 });
 
 // TODO
-ROUTER.post('/create', (req, res, next) => {
-  const params = {
-    body: req.body.filename,
-    meta: req.body.meta
-  }
-  createEssay(params).then(() => {
-    res.status(STATUS_OK).send({
-      success: true
-    })
-  }).catch(err => createError(400, err.message, next));
-});
+ROUTER.post('/create', (req, res, next) => {});
 
 module.exports = ROUTER;
