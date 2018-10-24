@@ -24,7 +24,10 @@ function getEssay(filename) {
 	})
 }
 
-function createEssay(params) {
+function createEssay({
+	text,
+	author
+}) {
 
 }
 

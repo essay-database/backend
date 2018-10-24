@@ -39,7 +39,11 @@ ROUTER.get('/:id', async (req, res, next) => {
 })
 
 ROUTER.post('/upload', (req, res, next) => {
-  createEssay(req.body.filename, req.body.meta).then(() => {
+  const params = {
+    body: req.body.filename,
+    meta: req.body.meta
+  }
+  createEssay(params).then(() => {
     res.status(STATUS_OK).send({
       success: true
     })
