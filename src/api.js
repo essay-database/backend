@@ -4,6 +4,9 @@ const {
   readdir
 } = require('fs');
 const {
+  join
+} = require('path');
+const {
   ESSAYS_PATH,
   DETAILS_PATH,
   INDEX_PATH
@@ -20,7 +23,7 @@ const getEssaysDetails = require('./sheets');
 const getEssaysContent = require('./drive');
 
 function initialize() {
-  authorize([getEssaysContent, getEssaysDetails]);
+  authorize([getEssaysContent, getEssaysDetails, createIndex]);
 }
 
 function createIndex() {
@@ -33,7 +36,7 @@ function createIndex() {
       entry = index.find(detail => file.includes(detail.id));
       if (entry) {
         try {
-          essay = await readEssay(file);
+          essay = await readEssay(join(ESSAYS_PATH, file));
           entry.paragraphs = essay.split(/\n/);
         } catch (error) {
           console.error(error);
@@ -49,7 +52,16 @@ function createIndex() {
   });
 }
 
-function getEssays(id) {
+function readEssay(filename) {
+  return new Promise((resolve, reject) => {
+    readFile(filename, (err, data) => {
+      if (err) reject(new Error(`unable to read ${filename}`));
+      else resolve(data);
+    });
+  });
+}
+
+function getEssay(id) {
   return new Promise((resolve, reject) => {
     if (!INDEX) {
       reject(`essays not found`);
@@ -71,15 +83,6 @@ function getEssays() {
   });
 }
 
-function readEssay(filename) {
-  return new Promise((resolve, reject) => {
-    readFile(filename, (err, data) => {
-      if (err) reject(new Error(`unable to read ${filename}`));
-      else resolve(data);
-    });
-  });
-}
-
 // TODO
 function createEssay({
   text,
@@ -94,8 +97,8 @@ function createError(status, message, next) {
 }
 
 module.exports = {
-  readEssay,
   createEssay,
+  getEssay,
   getEssays,
   createError,
   initialize

@@ -1,5 +1,9 @@
-const { google } = require('googleapis');
-const { writeFile } = require('fs');
+const {
+  google
+} = require('googleapis');
+const {
+  writeFile
+} = require('fs');
 const {
   DETAILS_SHEETID,
   DETAILS_RANGE,
@@ -9,15 +13,13 @@ const {
 const OPTIONS = {
   valueRenderOption: 'UNFORMATTED_VALUE'
 };
-const FILENAME = 'details.json';
 
 function getEssaysDetails(auth) {
   const sheets = google.sheets({
     version: 'v4',
     auth
   });
-  sheets.spreadsheets.values.get(
-    {
+  sheets.spreadsheets.values.get({
       spreadsheetId: DETAILS_SHEETID,
       range: DETAILS_RANGE,
       ...OPTIONS
