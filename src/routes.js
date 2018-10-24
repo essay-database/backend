@@ -32,6 +32,6 @@ ROUTER.get('/:id', async (req, res, next) => {
 });
 
 // TODO
-ROUTER.post('/create', (req, res, next) => {});
+// ROUTER.post('/create', (req, res, next) => {});
 
 module.exports = ROUTER;
