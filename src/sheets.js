@@ -5,18 +5,15 @@ const {
 	writeFile
 } = require('fs');
 const {
-	join
-} = require('path');
-const {
 	DETAILS_SHEETID,
 	DETAILS_RANGE,
-	ESSAYS_PATH
+	DETAILS_PATH
 } = require('../config.json');
 
 const OPTIONS = {
 	valueRenderOption: 'UNFORMATTED_VALUE'
 }
-const FILENAME = 'index.json';
+const FILENAME = 'details.json';
 
 function getEssaysDetails(auth) {
 	const sheets = google.sheets({
@@ -32,7 +29,7 @@ function getEssaysDetails(auth) {
 		let rows = res.data.values;
 		if (rows.length) {
 			rows = JSON.stringify(convertToObj(res.data.values));
-			return writeDetails(join(ESSAYS_PATH, FILENAME), rows);
+			writeDetails(DETAILS_PATH, rows);
 		} else {
 			console.log('No data found.');
 		}
