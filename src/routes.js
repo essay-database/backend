@@ -18,7 +18,7 @@ const {
 const ROUTER = express.Router();
 const STATUS_OK = 200;
 
-init();
+// init();
 
 ROUTER.get('/', (req, res, next) => {
   readdir(ESSAYS_PATH, async (err, files) => {
