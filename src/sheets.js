@@ -27,9 +27,7 @@ function getEssaysDetails(auth) {
     });
 }
 
-function combineResults(details) {
-
-}
+function combineResults(details) {}
 
 module.exports = {
     getEssaysDetails

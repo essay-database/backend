@@ -29,9 +29,7 @@ function getEssay(filename) {
 function createEssay({
 	text,
 	author
-}) {
-
-}
+}) {}
 
 function createError(status, message, next) {
 	const error = new Error(message);
