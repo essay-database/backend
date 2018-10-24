@@ -8,11 +8,13 @@ const {
 const {
   createEssay,
   getEssay,
-  createError
+  createError,
 } = require('./api');
+const {
+  ESSAYS_PATH
+} = require('./config.json');
 
 const ROUTER = express.Router();
-const ESSAYS_PATH = '../essays';
 const STATUS_OK = 200;
 
 ROUTER.get('/', (req, res, next) => {

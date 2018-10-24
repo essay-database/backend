@@ -1,4 +1,7 @@
 const {
+  createWriteStream
+} = require('fs');
+const {
   ESSAY_FOLDERID
 } = require('./config.json');
 const ESSAYS_PATH = '../essays';
@@ -55,7 +58,7 @@ async function downloadFiles(drive, files) {
 
 function downloadFile(drive, fileId, filename) {
   return new Promise((resolve, reject) => {
-    const dest = fs.createWriteStream(filename);
+    const dest = createWriteStream(filename);
     drive.files
       .export({
         fileId: fileId,

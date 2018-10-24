@@ -19,10 +19,10 @@ function getEssay(filename) {
 				reject(new Error(`unable to read ${filename}`));
 			else
 				resolve({
-					content: data
+					data
 				});
 		});
-	})
+	});
 }
 
 // TODO
@@ -35,7 +35,7 @@ function createError(status, message, next) {
 	const error = new Error(message);
 	error.status = status;
 	if (next) return next(error);
-	else return error
+	else return error;
 }
 
 module.exports = {

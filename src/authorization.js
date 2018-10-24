@@ -1,4 +1,7 @@
-const fs = require('fs');
+const {
+	readFile,
+	writeFile
+} = require('fs');
 const readline = require('readline');
 const {
 	google
@@ -16,7 +19,7 @@ const CREDENTIALS_PATH = join('credentials', 'credentials.json');
 
 // Load client secrets from a local file.
 function initialize(callbacks) {
-	fs.readFile(CREDENTIALS_PATH, (err, content) => {
+	readFile(CREDENTIALS_PATH, (err, content) => {
 		if (err) return console.error('Error loading client secret file:', err);
 		// Authorize a client with credentials, then call the Google Sheets API.
 		authorize(JSON.parse(content), callbacks);
@@ -38,7 +41,7 @@ function authorize(credentials, callbacks) {
 	const oAuth2Client = new google.auth.OAuth2(
 		client_id, client_secret, redirect_uris[0]);
 	// Check if we have previously stored a token.
-	fs.readFile(TOKEN_PATH, (err, token) => {
+	readFile(TOKEN_PATH, (err, token) => {
 		if (err) return getNewToken(oAuth2Client, callbacks);
 		oAuth2Client.setCredentials(JSON.parse(token));
 		callbacks.forEach(callback => {
@@ -69,7 +72,7 @@ function getNewToken(oAuth2Client, callbacks) {
 			if (err) return console.error('Error while trying to retrieve access token', err);
 			oAuth2Client.setCredentials(token);
 			// Store the token to disk for later program executions
-			fs.writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
+			writeFile(TOKEN_PATH, JSON.stringify(token), (err) => {
 				if (err) console.error(err);
 				console.log('Token stored to', TOKEN_PATH);
 			});
