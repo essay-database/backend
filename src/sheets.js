@@ -1,4 +1,7 @@
 const {
+	google
+} = require('googleapis');
+const {
 	writeFile
 } = require('fs');
 const {
@@ -6,7 +9,8 @@ const {
 } = require('path');
 const {
 	DETAILS_SHEETID,
-	DETAILS_RANGE
+	DETAILS_RANGE,
+	ESSAYS_JOIN
 } = require('./config.json');
 
 const OPTIONS = {
@@ -26,7 +30,7 @@ function getEssaysDetails(auth) {
 		if (err) return console.error('The API returned an error: ' + err);
 		const rows = res.data.values;
 		if (rows.length) {
-			return writeDetails(join(ESSAYS, 'index.json'), rows);
+			return writeDetails(join(ESSAYS_JOIN, 'index.json'), rows);
 		} else {
 			console.log('No data found.');
 		}

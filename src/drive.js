@@ -1,5 +1,12 @@
 const {
-  createWriteStream
+  google
+} = require('googleapis');
+const {
+  join
+} = require('path');
+const {
+  createWriteStream,
+  exists
 } = require('fs');
 const {
   ESSAY_FOLDERID
@@ -78,7 +85,7 @@ function downloadFile(drive, fileId, filename) {
             })
             .pipe(dest);
         }
-      })
+      });
   });
 }
 
