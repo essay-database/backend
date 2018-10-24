@@ -14,7 +14,7 @@ const {
 
 const OPTIONS = {
   orderBy: `createdTime desc`,
-  pageSize: 1, // dev only,
+  pageSize: 3, // dev only,
   q: `'${ESSAY_FOLDERID}' in parents`
 };
 

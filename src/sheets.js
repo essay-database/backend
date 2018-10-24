@@ -41,15 +41,15 @@ function getEssaysDetails(auth) {
 
 function convertToObj(rows) {
 	let headers;
-	let obj;
+	const obj = {};
 	const results = [];
 	rows.forEach((row, idx) => {
 		if (idx === 0) {
 			headers = row;
 		} else {
-			row.map((cell, idx) => ({
-				[headers[idx]]: cell
-			}));
+			row.forEach((cell, idx) => {
+				obj[headers[idx]] = cell
+			})
 			results.push(obj);
 		}
 	});
@@ -61,7 +61,7 @@ function writeDetails(filename, rows) {
 		if (err) {
 			return console.error(err);
 		}
-		console.log(`wrote ${filename}`);
+		console.log(`Wrote details in ${filename}`);
 	})
 }
 
