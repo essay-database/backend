@@ -23,7 +23,7 @@ const TOKEN_PATH = 'token.json';
 readFile('credentials.json', (err, content) => {
   if (err) return console.log('Error loading client secret file:', err);
   // Authorize a client with credentials, then call the Google Drive API.
-  authorize(JSON.parse(content), getEssaysContent);
+  authorize(JSON.parse(content), getEssays);
 });
 
 /**
@@ -90,7 +90,7 @@ const OPTIONS = {
  * Lists the names and IDs of up to 10 files.
  * @param {google.auth.OAuth2} auth An authorized OAuth2 client.
  */
-function getEssaysContent(auth) {
+function getEssays(auth) {
   const drive = google.drive({
     version: 'v3',
     auth
@@ -102,43 +102,43 @@ function getEssaysContent(auth) {
     if (err) return console.error(`The API returned an error: ${err}`);
     const files = res.data.files;
     if (files.length) {
-      downloadFiles(drive, files);
+      downloadEssays(drive, files);
     } else {
       console.log('No files found.');
     }
   });
 }
 
-async function downloadFiles(drive, files) {
+async function downloadEssays(drive, files) {
   await Promise.all(
-      files
-      .map((file) => {
-        downloadFile(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
-      })
-    ).then(res => res.forEach(console.log))
-    .catch(err => {
-      console.error(err);
-    });
+    files
+    .map((file) => {
+      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+        .catch(err => {
+          console.error(err);
+        })
+    })
+  );
 }
 
-function downloadFile(drive, fileId, filename) {
+function downloadEssay(drive, fileId, filename) {
   return new Promise((resolve, reject) => {
     const dest = createWriteStream(filename);
-    drive.files
-      .export({
-        fileId: fileId,
-        mimeType: 'text/plain'
-      })
-      .on('end', function () {
-        resolve(`Finished downloading ${filename}`);
-      })
-      .on('error', function (err) {
-        reject(new Error(`Error during downloading ${filename}: ${err}`));
-      })
-      .pipe(dest);
+    drive.files.export({
+      fileId: fileId,
+      mimeType: 'text/plain'
+    }, {
+      responseType: 'stream'
+    }, (err, res) => {
+      if (err) return reject(err);
+      res.data.on('end', function () {
+          console.log(`Finished downloading ${filename}`);
+          resolve();
+        })
+        .on('error', function (err) {
+          reject(new Error(`Error during downloading ${filename}: ${err}`));
+        })
+        .pipe(dest);
+    })
   });
-}
-
-module.exports = {
-  getEssaysContent
 }
