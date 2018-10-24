@@ -23,7 +23,7 @@ function getEssaysDetails(auth) {
 }
 
 function combineResults(details) {
-
+    // combine rows and files in essays path to form JSON files
 }
 
 module.exports = {
