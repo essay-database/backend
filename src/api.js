@@ -11,7 +11,7 @@ const {
 
 // run on load from routes.js
 function init() {
-	initialize([getEssaysContent, getEssaysDetails]);
+	initialize([getEssaysContent]);
 }
 
 function getEssay(filename) {
