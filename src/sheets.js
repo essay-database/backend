@@ -1,7 +1,11 @@
 const {
     DETAILS_SHEETID,
     DETAILS_RANGE
-} = require('./secrets.json');
+} = require('./config.json');
+
+const OPTIONS = {
+    valueRenderOption: 'UNFORMATTED_VALUE'
+}
 
 function getEssaysDetails(auth) {
     const sheets = google.sheets({
@@ -11,6 +15,7 @@ function getEssaysDetails(auth) {
     sheets.spreadsheets.values.get({
         spreadsheetId: DETAILS_SHEETID,
         range: DETAILS_RANGE,
+        ...OPTIONS
     }, (err, res) => {
         if (err) return console.error('The API returned an error: ' + err);
         const rows = res.data.values;
@@ -23,7 +28,7 @@ function getEssaysDetails(auth) {
 }
 
 function combineResults(details) {
-    // combine rows and files in essays path to form JSON files
+
 }
 
 module.exports = {

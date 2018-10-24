@@ -9,6 +9,7 @@ const {
 	getEssaysContent
 } = require('./drive');
 
+// run on load from routes.js
 initialize([getEssaysContent, getEssaysDetails]);
 
 function getEssay(filename) {
@@ -24,6 +25,7 @@ function getEssay(filename) {
 	})
 }
 
+// TODO
 function createEssay({
 	text,
 	author
@@ -34,7 +36,7 @@ function createEssay({
 function createError(status, message, next) {
 	const error = new Error(message);
 	error.status = status;
-	if (next) next(error);
+	if (next) return next(error);
 	else return error
 }
 

@@ -19,7 +19,12 @@ ROUTER.get('/', (req, res, next) => {
   readdir(ESSAYS_PATH, async (err, files) => {
     if (err) return createError(500, err.message, next);
     files = files.filter((name) => name.endsWith('.txt'));
-    const essays = await Promise.all(files.map(name => getEssay(join(ESSAYS_PATH, name)))).catch(err => createError(500, err.message, next));
+    let essays;
+    try {
+      essays = await Promise.all(files.map(name => getEssay(join(ESSAYS_PATH, name))));
+    } catch (err) {
+      return createError(500, err.message, next);
+    }
     res.status(STATUS_OK)
       .json(essays);
   })
@@ -36,8 +41,9 @@ ROUTER.get('/:id', async (req, res, next) => {
     .send({
       essay: data
     })
-})
+});
 
+// TODO
 ROUTER.post('/upload', (req, res, next) => {
   const params = {
     body: req.body.filename,

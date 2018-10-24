@@ -1,6 +1,6 @@
 const {
   ESSAY_FOLDERID
-} = require('./secrets.json');
+} = require('./config.json');
 const ESSAYS_PATH = '../essays';
 const OPTIONS = {
   orderBy: `createdDate desc`,
@@ -19,9 +19,8 @@ function retrieveAllEssays(drive, folderId, callback) {
   function retrievePageOfChildren(pageToken, result) {
     drive.children.list({
         folderId: folderId,
-        orderBy: OPTIONS.orderBy,
-        maxResults: OPTIONS.maxResults,
-        pageToken
+        pageToken,
+        ...OPTIONS
       },
       (err, res) => {
         if (err) return console.error('The API list returned an error: ' + err);
