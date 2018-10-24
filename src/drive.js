@@ -5,13 +5,12 @@ const {
   join
 } = require('path');
 const {
-  createWriteStream,
-  exists
+  createWriteStream
 } = require('fs');
 const {
-  ESSAY_FOLDERID
+  ESSAY_FOLDERID,
+  ESSAYS_PATH
 } = require('./config.json');
-const ESSAYS_PATH = '../essays';
 const OPTIONS = {
   orderBy: `createdDate desc`,
   maxResults: 12, // dev only

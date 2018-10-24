@@ -29,7 +29,7 @@ ROUTER.get('/', (req, res, next) => {
     }
     res.status(STATUS_OK)
       .json(essays);
-  })
+  });
 });
 
 ROUTER.get('/:id', async (req, res, next) => {
@@ -42,7 +42,7 @@ ROUTER.get('/:id', async (req, res, next) => {
   res.status(STATUS_OK)
     .send({
       essay: data
-    })
+    });
 });
 
 // TODO

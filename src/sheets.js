@@ -10,7 +10,7 @@ const {
 const {
 	DETAILS_SHEETID,
 	DETAILS_RANGE,
-	ESSAYS_JOIN
+	ESSAYS_PATH
 } = require('./config.json');
 
 const OPTIONS = {
@@ -30,7 +30,7 @@ function getEssaysDetails(auth) {
 		if (err) return console.error('The API returned an error: ' + err);
 		const rows = res.data.values;
 		if (rows.length) {
-			return writeDetails(join(ESSAYS_JOIN, 'index.json'), rows);
+			return writeDetails(join(ESSAYS_PATH, 'index.json'), rows);
 		} else {
 			console.log('No data found.');
 		}
@@ -43,7 +43,6 @@ function writeDetails(filename, rows) {
 			console.error(err);
 		}
 	})
-
 }
 
 module.exports = {
