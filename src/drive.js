@@ -11,39 +11,39 @@ const {
   ESSAY_FOLDERID,
   ESSAYS_PATH
 } = require('./config.json');
+
+
 const OPTIONS = {
   orderBy: `createdDate desc`,
-  maxResults: 12, // dev only
+  maxResults: 1, // dev only,
+  q: ``
 };
 
 function getEssaysContent(auth) {
   const drive = google.drive({
-    version: 'v2',
+    version: 'v3',
     auth
   });
-  retrieveAllEssays(drive, ESSAY_FOLDERID, downloadFiles);
+  retrieveAllEssays(drive, downloadFiles);
 }
 
-function retrieveAllEssays(drive, folderId, callback) {
-  function retrievePageOfChildren(pageToken, result) {
-    drive.children.list({
-        folderId: folderId,
-        pageToken,
-        ...OPTIONS
-      },
-      (err, res) => {
-        if (err) return console.error('The API list returned an error: ' + err);
-        result = result.concat(res.data.items);
-        const nextPageToken = res.nextPageToken;
-        if (nextPageToken) {
-          retrievePageOfChildren(nextPageToken, result);
-        } else {
-          callback(drive, result);
-        }
-      }
-    );
-  };
-  retrievePageOfChildren('', []);
+function retrieveAllEssays(drive, callback) {
+  const drive = google.drive({
+    version: 'v3',
+    auth
+  });
+  drive.files.list({
+    fields: 'nextPageToken, files(id, name)',
+    ...OPTIONS
+  }, (err, res) => {
+    if (err) return console.error('The API returned an error: ' + err);
+    const files = res.data.files;
+    if (files.length) {
+      callback(drive, files);
+    } else {
+      console.log('No files found.');
+    }
+  });
 }
 
 async function downloadFiles(drive, files) {
