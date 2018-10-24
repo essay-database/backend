@@ -1,7 +1,7 @@
 // create new document
-function getNewID() {
+function getNewID(drive) {
   return new Promise((resolve, reject) => {
-    DRIVE.files.generateIds((err, res) => {
+    drive.files.generateIds((err, res) => {
       if (err) return reject(err);
       else {
         resolve(res.data.ids[0]);
@@ -18,7 +18,7 @@ function getNewID() {
 //   }
 // }
 
-async function createEssay(filePath, metaData) {
+async function createEssay(drive, filePath, metaData) {
   const id = await getNewID().catch(err => {
     console.error(err);
     return getRandomID();
@@ -31,13 +31,12 @@ async function createEssay(filePath, metaData) {
     mimeType: 'text/plain',
     body: fs.createReadStream(filePath)
   };
-  DRIVE.files.insert(
-    {
+  drive.files.insert({
       resource: fileMetadata,
       media: media,
       fields: 'id'
     },
-    function(err, file) {
+    function (err, file) {
       if (err) {
         console.error(err);
       } else {

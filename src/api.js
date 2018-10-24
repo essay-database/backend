@@ -9,7 +9,11 @@ const {
 	getEssaysContent
 } = require('./drive');
 
-initialize([getEssaysContent, getEssaysDetails]);
+initialize([getEssaysContent, getEssaysDetails, combineResults]);
+
+function combineResults(content, details) {
+
+}
 
 function getEssay(filename) {
 	return new Promise((resolve, reject) => {

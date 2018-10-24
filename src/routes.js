@@ -12,7 +12,7 @@ const {
 } = require('./api');
 
 const ROUTER = express.Router();
-const ESSAYS_PATH = './essays';
+const ESSAYS_PATH = '../essays';
 const STATUS_OK = 200;
 
 ROUTER.get('/', (req, res, next) => {
