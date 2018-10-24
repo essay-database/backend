@@ -8,14 +8,19 @@ const {
   DETAILS_PATH,
   INDEX_PATH
 } = require('../config.js');
-const DETAILS = require(DETAILS_PATH);
-const INDEX = require(INDEX_PATH);
+let DETAILS, INDEX;
+try {
+  DETAILS = require(DETAILS_PATH);
+  INDEX = require(INDEX_PATH);
+} catch (e) {
+  console.error(`error loading file: ${e}`);
+}
 const authorize = require('./authorization');
 const getEssaysDetails = require('./sheets');
 const getEssaysContent = require('./drive');
 
 function initialize() {
-  authorize([getEssaysContent, getEssaysDetails, createIndex]);
+  authorize([getEssaysContent, getEssaysDetails]);
 }
 
 function createIndex() {
@@ -24,17 +29,21 @@ function createIndex() {
   readdir(ESSAYS_PATH, (err, files) => {
     if (err) return reject(err);
     files = files.filter(file => file.endsWith('.txt'));
-    files.array.forEach(async file => {
+    files.forEach(async file => {
       entry = index.find(detail => file.includes(detail.id));
-      try {
-        essay = await readEssay(file);
-        entry.paragraphs = essay.split(/\n/);
-      } catch (error) {
-        console.error(error);
+      if (entry) {
+        try {
+          essay = await readEssay(file);
+          entry.paragraphs = essay.split(/\n/);
+        } catch (error) {
+          console.error(error);
+        }
+      } else {
+        console.error(`entry not found: ${file}`);
       }
     });
   });
-  writeFile(INDEX_PATH, index, err => {
+  writeFile(INDEX_PATH, JSON.stringify(index), err => {
     if (err) return console.error(err);
     console.log(`Wrote ${INDEX_PATH}`);
   });
