@@ -1,5 +1,13 @@
-const { readFile, writeFile } = require('fs');
-const { ESSAYS_PATH, DETAILS_PATH, INDEX_PATH } = require('../config.js');
+const {
+  readFile,
+  writeFile,
+  readdir
+} = require('fs');
+const {
+  ESSAYS_PATH,
+  DETAILS_PATH,
+  INDEX_PATH
+} = require('../config.js');
 const DETAILS = require(DETAILS_PATH);
 const INDEX = require(INDEX_PATH);
 const authorize = require('./authorization');
@@ -64,10 +72,10 @@ function readEssay(filename) {
 }
 
 // TODO
-// function createEssay({
-// 	text,
-// 	author
-// }) {}
+function createEssay({
+  text,
+  author
+}) {}
 
 function createError(status, message, next) {
   const error = new Error(message);

@@ -8,6 +8,10 @@ module.exports = {
   "DETAILS_RANGE": "essays!A1:K14",
   "SCOPES": ["https://www.googleapis.com/auth/drive"],
   "ESSAYS_PATH": join(__dirname, "essays"),
-  "DETAILS_PATH": () => join(this.ESSAYS_PATH, 'details.json'),
-  "INDEX_PATH": () => join(this.ESSAYS_PATH, 'index.json'),
+  get DETAILS_PATH() {
+    return join(this.ESSAYS_PATH, 'details.json')
+  },
+  get INDEX_PATH() {
+    return join(this.ESSAYS_PATH, 'index.json')
+  },
 };
