@@ -10,7 +10,9 @@ const {
 } = require('./drive');
 
 // run on load from routes.js
-initialize([getEssaysContent, getEssaysDetails]);
+function init() {
+	initialize([getEssaysContent, getEssaysDetails]);
+}
 
 function getEssay(filename) {
 	return new Promise((resolve, reject) => {
@@ -41,5 +43,6 @@ function createError(status, message, next) {
 module.exports = {
 	getEssay,
 	createEssay,
-	createError
+	createError,
+	init
 }
