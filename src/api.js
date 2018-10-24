@@ -1,13 +1,13 @@
 const {
 	readFile
 } = require('fs');
-const initialize = require('./authorization');
+const authorize = require('./authorization');
 const getEssaysDetails = require('./sheets');
 const getEssaysContent = require('./drive');
 
 // run on load from routes.js
-function init() {
-	initialize([getEssaysContent, getEssaysDetails]);
+function initialize() {
+	authorize([getEssaysContent, getEssaysDetails]);
 }
 
 function getEssay(filename) {
@@ -41,5 +41,5 @@ module.exports = {
 	getEssay,
 	createEssay,
 	createError,
-	init
+	initialize
 }

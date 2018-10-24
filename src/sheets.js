@@ -59,8 +59,9 @@ function convertToObj(rows) {
 function writeDetails(filename, rows) {
 	writeFile(filename, rows, (err) => {
 		if (err) {
-			console.error(err);
+			return console.error(err);
 		}
+		console.log(`wrote ${filename}`);
 	})
 }
 

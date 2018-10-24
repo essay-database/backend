@@ -27,7 +27,7 @@ function getEssaysContent(auth) {
     ...OPTIONS,
     fields: 'nextPageToken, files(id)',
   }, (err, res) => {
-    if (err) return console.error(`The API returned an error: ${err}`);
+    if (err) return console.error(`API returned error: ${err}`);
     const files = res.data.files;
     if (files.length) {
       downloadEssays(drive, files);
