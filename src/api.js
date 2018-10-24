@@ -35,7 +35,6 @@ function createError(status, message, next) {
 	else return error
 }
 
-
 module.exports = {
 	getEssay,
 	createEssay,

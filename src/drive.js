@@ -30,7 +30,7 @@ function retrieveAllEssays(drive, folderId, callback) {
         if (nextPageToken) {
           retrievePageOfChildren(nextPageToken, result);
         } else {
-          callback(result);
+          callback(drive, result);
         }
       }
     );
@@ -38,12 +38,12 @@ function retrieveAllEssays(drive, folderId, callback) {
   retrievePageOfChildren('', []);
 }
 
-async function downloadFiles(files) {
+async function downloadFiles(drive, files) {
   if (files) {
     await Promise.all(
         files
         .map((file) => {
-          downloadFile(file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+          downloadFile(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
         })
       ).then(res => res.forEach(console.log))
       .catch(err => {

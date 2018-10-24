@@ -1,11 +1,8 @@
-// packages
 const express = require('express');
-// modules
 const essaysRouter = require('./routes');
 const {
   createError
-} = require('./shared');
-require('./drive');
+} = require('./api');
 
 const app = express();
 app.use(express.json());
