@@ -8,8 +8,7 @@ const {
 const {
   createEssay,
   getEssay,
-  createError,
-  init
+  createError
 } = require('./api');
 const {
   ESSAYS_PATH
@@ -17,8 +16,6 @@ const {
 
 const ROUTER = express.Router();
 const STATUS_OK = 200;
-
-// init();
 
 ROUTER.get('/', (req, res, next) => {
   readdir(ESSAYS_PATH, async (err, files) => {

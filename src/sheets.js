@@ -28,7 +28,8 @@ function getEssaysDetails(auth) {
 		...OPTIONS
 	}, (err, res) => {
 		if (err) return console.error('The API returned an error: ' + err);
-		const rows = res.data.values;
+		let rows = res.data.values;
+		rows = JSON.stringify(rows);
 		if (rows.length) {
 			return writeDetails(join(ESSAYS_PATH, 'index.json'), rows);
 		} else {
