@@ -69,8 +69,6 @@ function downloadFile(drive, fileId, filename) {
       .export({
         fileId: fileId,
         mimeType: 'text/plain'
-      }, {
-        responseType: 'stream'
       }, (err, res) => {
         if (err) {
           reject(err)
