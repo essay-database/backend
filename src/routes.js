@@ -8,8 +8,7 @@ const {
 const {
   createEssay,
   getEssay,
-  createError,
-  init
+  createError
 } = require('./api');
 const {
   ESSAYS_PATH
@@ -46,13 +45,8 @@ ROUTER.get('/:id', async (req, res, next) => {
     });
 });
 
-ROUTER.get('/init', (req, res) => {
-  init();
-  res.status(STATUS_OK).send('OK');
-})
-
 // TODO
-ROUTER.post('/upload', (req, res, next) => {
+ROUTER.post('/create', (req, res, next) => {
   const params = {
     body: req.body.filename,
     meta: req.body.meta

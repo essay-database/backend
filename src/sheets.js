@@ -11,7 +11,7 @@ const {
 	DETAILS_SHEETID,
 	DETAILS_RANGE,
 	ESSAYS_PATH
-} = require('./config.json');
+} = require('../config.json');
 
 const OPTIONS = {
 	valueRenderOption: 'UNFORMATTED_VALUE'
@@ -42,7 +42,7 @@ function getEssaysDetails(auth) {
 function convertToObj(rows) {
 	let headers;
 	let obj;
-	const results;
+	const results = [];
 	rows.forEach((row, idx) => {
 		if (idx === 0) {
 			headers = row;

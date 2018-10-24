@@ -14,8 +14,8 @@ const {
 	SCOPES
 } = require('../config.json');
 
-const TOKEN_PATH = join('credentials', 'token.json');
-const CREDENTIALS_PATH = join('credentials', 'credentials.json');
+const TOKEN_PATH = 'token.json';
+const CREDENTIALS_PATH = 'credentials.json';
 
 // Load client secrets from a local file.
 function initialize(callbacks) {

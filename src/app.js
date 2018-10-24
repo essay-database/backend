@@ -1,11 +1,18 @@
 const express = require('express');
 const essaysRouter = require('./routes');
 const {
-  createError
+  createError,
+  init
 } = require('./api');
 
 const app = express();
 app.use(express.json());
+
+app.get('/init', (req, res) => {
+  init();
+  res.status(200).send('OK');
+})
+
 app.use('/essays', essaysRouter);
 
 // catch 404 and forward to error handler

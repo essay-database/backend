@@ -31,6 +31,7 @@ function createEssay({
 
 function createError(status, message, next) {
 	const error = new Error(message);
+	console.error(message);
 	error.status = status;
 	if (next) return next(error);
 	else return error;
