@@ -8,11 +8,12 @@ const {
 const {
   createEssay,
   getEssay,
-  createError
+  createError,
+  init
 } = require('./api');
 const {
   ESSAYS_PATH
-} = require('./config.json');
+} = require('../config.json');
 
 const ROUTER = express.Router();
 const STATUS_OK = 200;
@@ -44,6 +45,11 @@ ROUTER.get('/:id', async (req, res, next) => {
       essay: data
     });
 });
+
+ROUTER.get('/init', (req, res) => {
+  init();
+  res.status(STATUS_OK).send('OK');
+})
 
 // TODO
 ROUTER.post('/upload', (req, res, next) => {

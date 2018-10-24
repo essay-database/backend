@@ -31,3 +31,4 @@ Thumbs.db
 # nodejs #
 ######################
 node_modules
+credentials.json

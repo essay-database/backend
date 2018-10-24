@@ -16,6 +16,7 @@ const {
 const OPTIONS = {
 	valueRenderOption: 'UNFORMATTED_VALUE'
 }
+const FILENAME = 'index.json';
 
 function getEssaysDetails(auth) {
 	const sheets = google.sheets({
@@ -29,13 +30,30 @@ function getEssaysDetails(auth) {
 	}, (err, res) => {
 		if (err) return console.error('The API returned an error: ' + err);
 		let rows = res.data.values;
-		rows = JSON.stringify(rows);
 		if (rows.length) {
-			return writeDetails(join(ESSAYS_PATH, 'index.json'), rows);
+			rows = JSON.stringify(convertToObj(res.data.values));
+			return writeDetails(join(ESSAYS_PATH, FILENAME), rows);
 		} else {
 			console.log('No data found.');
 		}
 	});
+}
+
+function convertToObj(rows) {
+	let headers;
+	let obj;
+	const results;
+	rows.forEach((row, idx) => {
+		if (idx === 0) {
+			headers = row;
+		} else {
+			row.map((cell, idx) => ({
+				[headers[idx]]: cell
+			}));
+			results.push(obj);
+		}
+	});
+	return results;
 }
 
 function writeDetails(filename, rows) {
@@ -46,6 +64,4 @@ function writeDetails(filename, rows) {
 	})
 }
 
-module.exports = {
-	getEssaysDetails
-}
+module.exports = getEssaysDetails;

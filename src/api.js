@@ -2,16 +2,12 @@ const {
 	readFile
 } = require('fs');
 const initialize = require('./authorization');
-const {
-	getEssaysDetails
-} = require('./sheets');
-const {
-	getEssaysContent
-} = require('./drive');
+const getEssaysDetails = require('./sheets');
+const getEssaysContent = require('./drive');
 
 // run on load from routes.js
 function init() {
-	initialize([getEssaysContent]);
+	initialize([getEssaysContent, getEssaysDetails]);
 }
 
 function getEssay(filename) {

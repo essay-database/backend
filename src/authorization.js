@@ -12,7 +12,7 @@ const {
 // If modifying these scopes, delete token.json.
 const {
 	SCOPES
-} = require('./config.json');
+} = require('../config.json');
 
 const TOKEN_PATH = join('credentials', 'token.json');
 const CREDENTIALS_PATH = join('credentials', 'credentials.json');
