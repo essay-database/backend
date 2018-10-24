@@ -24,7 +24,9 @@ function getEssay(filename) {
 	})
 }
 
-function createEssay(params) {}
+function createEssay(params) {
+
+}
 
 function createError(status, message, next) {
 	const error = new Error(message);
