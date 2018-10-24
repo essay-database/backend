@@ -9,11 +9,7 @@ const {
 	getEssaysContent
 } = require('./drive');
 
-initialize([getEssaysContent, getEssaysDetails, combineResults]);
-
-function combineResults(content, details) {
-
-}
+initialize([getEssaysContent, getEssaysDetails]);
 
 function getEssay(filename) {
 	return new Promise((resolve, reject) => {
@@ -28,9 +24,7 @@ function getEssay(filename) {
 	})
 }
 
-function createEssay(params) {
-
-}
+function createEssay(params) {}
 
 function createError(status, message, next) {
 	const error = new Error(message);

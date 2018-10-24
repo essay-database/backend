@@ -15,11 +15,15 @@ function getEssaysDetails(auth) {
         if (err) return console.error('The API returned an error: ' + err);
         const rows = res.data.values;
         if (rows.length) {
-            return rows;
+            return combineResults(rows);
         } else {
             console.log('No data found.');
         }
     });
+}
+
+function combineResults(details) {
+
 }
 
 module.exports = {
