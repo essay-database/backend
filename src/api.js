@@ -23,7 +23,7 @@ const getEssaysDetails = require('./sheets');
 const getEssaysContent = require('./drive');
 
 function initialize() {
-  authorize([createIndex]);
+  authorize([getEssaysDetails, getEssaysContent, createIndex]);
 }
 
 function createIndex() {
@@ -54,8 +54,7 @@ function createIndex() {
 
 function readEssay(filename) {
   return new Promise((resolve, reject) => {
-    console.log(filename);
-    readFile(filename, (err, data) => {
+    readFile(filename, 'utf8', (err, data) => {
       if (err) reject(new Error(`unable to read ${filename}`));
       else resolve(data);
     });
@@ -84,12 +83,6 @@ function getEssays() {
   });
 }
 
-// TODO
-function createEssay({
-  text,
-  author
-}) {}
-
 function createError(status, message, next) {
   const error = new Error(message);
   error.status = status;
@@ -98,7 +91,6 @@ function createError(status, message, next) {
 }
 
 module.exports = {
-  createEssay,
   getEssay,
   getEssays,
   createError,

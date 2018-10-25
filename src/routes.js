@@ -2,7 +2,6 @@ const express = require('express');
 const {
   getEssay,
   getEssays,
-  createEssay,
   createError
 } = require('./api');
 
@@ -30,8 +29,5 @@ ROUTER.get('/:id', async (req, res, next) => {
   res.status(STATUS_OK)
     .json(essay);
 });
-
-// TODO
-// ROUTER.post('/create', (req, res, next) => {});
 
 module.exports = ROUTER;
