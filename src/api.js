@@ -23,28 +23,29 @@ const getEssaysDetails = require('./sheets');
 const getEssaysContent = require('./drive');
 
 function initialize() {
-  authorize([getEssaysDetails, getEssaysContent, createIndex]);
+  authorize([getEssaysDetails, createIndex]);
 }
 
 function createIndex() {
   let entry;
   const index = DETAILS;
-  readdir(ESSAYS_PATH, (err, files) => {
+  readdir(ESSAYS_PATH, async (err, files) => {
     if (err) return reject(err);
     files = files.filter(file => file.endsWith('.txt'));
-    files.forEach(async file => {
+    for (const file of files) {
       entry = index.find(detail => file.includes(detail.id));
       if (entry) {
         try {
           essay = await readEssay(join(ESSAYS_PATH, file));
           entry.paragraphs = essay.split(/\n/);
+          console.dir(essay);
         } catch (error) {
           console.error(error);
         }
       } else {
         console.error(`entry not found: ${file}`);
       }
-    });
+    }
   });
   writeFile(INDEX_PATH, JSON.stringify(index), err => {
     if (err) return console.error(err);
