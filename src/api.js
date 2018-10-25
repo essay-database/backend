@@ -1,6 +1,4 @@
 const {
-  readFile,
-  writeFile,
   readdir
 } = require('fs');
 const {
@@ -11,6 +9,10 @@ const {
   DETAILS_PATH,
   INDEX_PATH
 } = require('../config.js');
+const {
+  write
+} = require('./shared');
+
 let DETAILS, INDEX;
 try {
   DETAILS = require(DETAILS_PATH);
@@ -45,21 +47,10 @@ function createIndex() {
         console.error(`entry not found: ${file}`);
       }
     }
-    writeFile(INDEX_PATH, JSON.stringify(index), err => {
-      if (err) return console.error(err);
-      console.log(`Wrote ${INDEX_PATH}`);
-    });
+    write(INDEX_PATH, JSON.stringify(index));
   });
 }
 
-function readEssay(filename) {
-  return new Promise((resolve, reject) => {
-    readFile(filename, 'utf8', (err, data) => {
-      if (err) reject(new Error(`unable to read ${filename}`));
-      else resolve(data);
-    });
-  });
-}
 
 function getEssay(id) {
   return new Promise((resolve, reject) => {

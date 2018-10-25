@@ -2,13 +2,13 @@ const {
   google
 } = require('googleapis');
 const {
-  writeFile
-} = require('fs');
-const {
   DETAILS_SHEETID,
   DETAILS_RANGE,
   DETAILS_PATH
 } = require('../config.js');
+const {
+  write
+} = require('./shared');
 
 const OPTIONS = {
   valueRenderOption: 'UNFORMATTED_VALUE'
@@ -26,10 +26,12 @@ function getEssaysDetails(auth) {
     },
     (err, res) => {
       if (err) return console.error('The API returned an error: ' + err);
-      let rows = res.data.values;
+      const rows = res.data.values;
       if (rows.length) {
-        rows = JSON.stringify(convertObj(rows));
-        writeDetails(DETAILS_PATH, rows);
+        const data = JSON.stringify(convertObj(rows));
+        write(DETAILS_PATH, data)
+          .then(msg => console.log(msg))
+          .catch(err => console.error(err));
       } else {
         console.log('No data found.');
       }
@@ -52,15 +54,6 @@ function convertObj(rows) {
     }
   });
   return results;
-}
-
-function writeDetails(filename, data) {
-  writeFile(filename, data, err => {
-    if (err) {
-      return console.error(err);
-    }
-    console.log(`Wrote details in ${filename}`);
-  });
 }
 
 module.exports = getEssaysDetails;

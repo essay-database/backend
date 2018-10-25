@@ -13,7 +13,7 @@ ROUTER.get('/', async (req, res, next) => {
   try {
     essays = await getEssays();
   } catch (err) {
-    return createError(404, error.message, next);
+    return createError(500, error.message, next);
   }
   res.status(STATUS_OK)
     .json(essays);
@@ -29,16 +29,5 @@ ROUTER.get('/:id', async (req, res, next) => {
   res.status(STATUS_OK)
     .json(essay);
 });
-
-async function route() {
-  let data;
-  try {
-    data = await getEssay(id);
-  } catch (error) {
-    return createError(404, error.message, next);
-  }
-  res.status(STATUS_OK)
-    .json(data);
-}
 
 module.exports = ROUTER;
