@@ -48,7 +48,6 @@ function convertObj(rows) {
       row.forEach((cell, idx) => {
         obj[headers[idx]] = cell;
       });
-      console.log(obj);
       results.push(obj);
     }
   });

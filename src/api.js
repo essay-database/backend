@@ -23,7 +23,7 @@ const getEssaysDetails = require('./sheets');
 const getEssaysContent = require('./drive');
 
 function initialize() {
-  authorize([getEssaysContent, getEssaysDetails, createIndex]);
+  authorize([createIndex]);
 }
 
 function createIndex() {
@@ -38,7 +38,6 @@ function createIndex() {
         try {
           essay = await readEssay(join(ESSAYS_PATH, file));
           entry.paragraphs = essay.split(/\n/);
-          console.dir(essay);
         } catch (error) {
           console.error(error);
         }
