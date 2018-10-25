@@ -41,6 +41,7 @@ function createIndex() {
           const essay = await read(join(ESSAYS_PATH, file));
           const sep = '||';
           let paragraphs = essay.replace(/[\n\r]+/g, sep);
+          paragraphs = paragraphs.replace(/[\x00-\x1F\x7F-\x9F]/g, "");
           paragraphs = paragraphs.split(sep);
           entry.paragraphs = paragraphs;
         } catch (error) {
