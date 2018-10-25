@@ -10,7 +10,8 @@ const {
   INDEX_PATH
 } = require('../config.js');
 const {
-  write
+  write,
+  read
 } = require('./shared');
 
 let DETAILS, INDEX;
@@ -29,17 +30,19 @@ function initialize() {
 }
 
 function createIndex() {
-  let entry;
   const index = DETAILS;
   readdir(ESSAYS_PATH, async (err, files) => {
     if (err) return reject(err);
     files = files.filter(file => file.endsWith('.txt'));
     for (const file of files) {
-      entry = index.find(detail => file.includes(detail.id));
+      const entry = index.find(detail => file.includes(detail.id));
       if (entry) {
         try {
-          essay = await readEssay(join(ESSAYS_PATH, file));
-          entry.paragraphs = essay.split(/\n/);
+          const essay = await read(join(ESSAYS_PATH, file));
+          const sep = '||';
+          let paragraphs = essay.replace(/[\n\r]+/g, sep);
+          paragraphs = paragraphs.split(sep);
+          entry.paragraphs = paragraphs;
         } catch (error) {
           console.error(error);
         }

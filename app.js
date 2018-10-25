@@ -1,5 +1,5 @@
 const express = require('express');
-const essaysRouter = require('./routes');
+const essaysRouter = require('./src/routes');
 const {
   createError,
   initialize
