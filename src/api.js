@@ -28,7 +28,7 @@ function initialize() {
 
 function createIndex() {
   let entry;
-  const index = DETAILS || {};
+  const index = DETAILS;
   readdir(ESSAYS_PATH, async (err, files) => {
     if (err) return reject(err);
     files = files.filter(file => file.endsWith('.txt'));
@@ -45,10 +45,10 @@ function createIndex() {
         console.error(`entry not found: ${file}`);
       }
     }
-  });
-  writeFile(INDEX_PATH, JSON.stringify(index), err => {
-    if (err) return console.error(err);
-    console.log(`Wrote ${INDEX_PATH}`);
+    writeFile(INDEX_PATH, JSON.stringify(index), err => {
+      if (err) return console.error(err);
+      console.log(`Wrote ${INDEX_PATH}`);
+    });
   });
 }
 

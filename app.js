@@ -3,7 +3,7 @@ const essaysRouter = require('./routes');
 const {
   createError,
   initialize
-} = require('./api');
+} = require('./src/api');
 
 const app = express();
 app.use(express.json());

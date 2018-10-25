@@ -30,4 +30,15 @@ ROUTER.get('/:id', async (req, res, next) => {
     .json(essay);
 });
 
+async function route() {
+  let data;
+  try {
+    data = await getEssay(id);
+  } catch (error) {
+    return createError(404, error.message, next);
+  }
+  res.status(STATUS_OK)
+    .json(data);
+}
+
 module.exports = ROUTER;

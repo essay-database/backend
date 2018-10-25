@@ -28,7 +28,7 @@ function getEssaysDetails(auth) {
       if (err) return console.error('The API returned an error: ' + err);
       let rows = res.data.values;
       if (rows.length) {
-        rows = JSON.stringify(convertObj(res.data.values));
+        rows = JSON.stringify(convertObj(rows));
         writeDetails(DETAILS_PATH, rows);
       } else {
         console.log('No data found.');
@@ -54,8 +54,8 @@ function convertObj(rows) {
   return results;
 }
 
-function writeDetails(filename, rows) {
-  writeFile(filename, rows, err => {
+function writeDetails(filename, data) {
+  writeFile(filename, data, err => {
     if (err) {
       return console.error(err);
     }
