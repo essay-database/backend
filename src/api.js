@@ -54,6 +54,7 @@ function createIndex() {
 
 function readEssay(filename) {
   return new Promise((resolve, reject) => {
+    console.log(filename);
     readFile(filename, (err, data) => {
       if (err) reject(new Error(`unable to read ${filename}`));
       else resolve(data);
