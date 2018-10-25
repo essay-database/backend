@@ -28,7 +28,6 @@ function getEssaysDetails(auth) {
       if (err) return console.error('The API returned an error: ' + err);
       let rows = res.data.values;
       if (rows.length) {
-        console.log(rows);
         rows = JSON.stringify(convertObj(res.data.values));
         writeDetails(DETAILS_PATH, rows);
       } else {
@@ -40,15 +39,16 @@ function getEssaysDetails(auth) {
 
 function convertObj(rows) {
   let headers;
-  const obj = {};
   const results = [];
   rows.forEach((row, idx) => {
     if (idx === 0) {
       headers = row;
     } else {
+      const obj = {};
       row.forEach((cell, idx) => {
         obj[headers[idx]] = cell;
       });
+      console.log(obj);
       results.push(obj);
     }
   });

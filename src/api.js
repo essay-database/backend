@@ -23,12 +23,12 @@ const getEssaysDetails = require('./sheets');
 const getEssaysContent = require('./drive');
 
 function initialize() {
-  authorize([getEssaysDetails, createIndex]);
+  authorize([getEssaysContent, getEssaysDetails, createIndex]);
 }
 
 function createIndex() {
   let entry;
-  const index = DETAILS;
+  const index = DETAILS || {};
   readdir(ESSAYS_PATH, async (err, files) => {
     if (err) return reject(err);
     files = files.filter(file => file.endsWith('.txt'));
