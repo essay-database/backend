@@ -47,9 +47,7 @@ function authorize(credentials, callbacks) {
   readFile(TOKEN_PATH, 'utf8', (err, token) => {
     if (err) return getNewToken(oAuth2Client, callbacks);
     oAuth2Client.setCredentials(JSON.parse(token));
-    callbacks.forEach(callback => {
-      callback(oAuth2Client);
-    });
+    execCallbacks(callbacks, oAuth2Client);
   });
 }
 
@@ -83,10 +81,15 @@ function getNewToken(oAuth2Client, callbacks) {
         if (err) console.error(err);
         console.log('Token stored to', TOKEN_PATH);
       });
-      callbacks.forEach(callback => {
-        callback(oAuth2Client);
-      });
+      execCallbacks(callbacks, oAuth2Client);
     });
+  });
+}
+
+// TODO convert to promises ?
+function execCallbacks(callbacks, oAuth2Client) {
+  callbacks.forEach(callback => {
+    callback(oAuth2Client);
   });
 }
 
