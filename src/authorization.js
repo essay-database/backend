@@ -1,7 +1,6 @@
 const { readFile, writeFile } = require("fs");
 const readline = require("readline");
 const { google } = require("googleapis");
-const { join } = require("path");
 // If modifying these scopes, delete token.json.
 const { SCOPES } = require("../config.js");
 

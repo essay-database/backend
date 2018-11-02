@@ -11,7 +11,7 @@ app.get("/init", async (req, res, next) => {
   try {
     await initialize();
   } catch (error) {
-    return createError(500, error.message, next);
+    createError(500, error.message, next);
   }
   res.status(STATUS_OK).send("initialize complete");
 });
@@ -26,11 +26,12 @@ app.use((req, res, next) => {
 // error handler
 app.use((err, req, res, next) => {
   if (res.headersSent) {
-    return next(err);
+    next(err);
+  } else {
+    // console.error(err);
+    res.status(err.status || 500);
+    res.send("an error occured");
   }
-  res.status(err.status || 500);
-  console.error(err);
-  res.send("an error occured");
 });
 
 module.exports = app;
