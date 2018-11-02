@@ -2,7 +2,8 @@ const express = require('express');
 const {
   getEssay,
   getEssays,
-  createError
+  createError,
+  getFeatured
 } = require('./api');
 
 const ROUTER = express.Router();
@@ -20,7 +21,14 @@ ROUTER.get('/', async (req, res, next) => {
 });
 
 ROUTER.get('/featured', async function  (req, res, next) {
-
+  let essays;
+  try {
+    essays = await getFeatured();
+  } catch (err) {
+    return createError(500, error.message, next);
+  }
+  res.status(STATUS_OK)
+    .json(essays);
 })
 
 ROUTER.get('/:id', async (req, res, next) => {

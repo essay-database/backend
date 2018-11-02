@@ -9,7 +9,7 @@ const app = express();
 app.use(express.json());
 
 app.get('/init', (req, res) => {
-  initialize();
+  await initialize();
   res.status(200).send('OK');
 })
 

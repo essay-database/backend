@@ -42,7 +42,12 @@ function getEssay(id) {
 }
 
 function getFeatured() {
-
+  return new Promise((resolve, reject) => {
+    if (!INDEX)
+      reject('essays not found')
+    else
+      resolve(INDEX.filter(essay => essay.featured === true))
+  });
 }
 
 function getEssays() {
@@ -96,5 +101,6 @@ module.exports = {
   getEssay,
   getEssays,
   createError,
-  initialize
+  initialize,
+  getFeatured
 };
