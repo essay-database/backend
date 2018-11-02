@@ -1,16 +1,7 @@
-const {
-  join
-} = require('path');
-const {
-  createWriteStream
-} = require('fs');
-const {
-  google
-} = require('googleapis');
-const {
-  ESSAY_FOLDERID,
-  ESSAYS_PATH
-} = require('../config.js');
+const { join } = require("path");
+const { createWriteStream } = require("fs");
+const { google } = require("googleapis");
+const { ESSAY_FOLDERID, ESSAYS_PATH } = require("../config.js");
 
 const OPTIONS = {
   orderBy: `createdTime desc`,
@@ -20,12 +11,13 @@ const OPTIONS = {
 
 function getEssaysContent(auth) {
   const drive = google.drive({
-    version: 'v3',
+    version: "v3",
     auth
   });
-  drive.files.list({
+  drive.files.list(
+    {
       ...OPTIONS,
-      fields: 'nextPageToken, files(id)'
+      fields: "nextPageToken, files(id)"
     },
     (err, res) => {
       if (err) return console.error(`API returned error: ${err}`);
@@ -33,7 +25,7 @@ function getEssaysContent(auth) {
       if (files.length) {
         downloadEssays(drive, files);
       } else {
-        console.log('No files found.');
+        console.log("No files found.");
       }
     }
   );
@@ -54,20 +46,22 @@ async function downloadEssays(drive, files) {
 function downloadEssay(drive, fileId, filename) {
   return new Promise((resolve, reject) => {
     const dest = createWriteStream(filename);
-    drive.files.export({
-        fileId: fileId,
-        mimeType: 'text/plain'
-      }, {
-        responseType: 'stream'
+    drive.files.export(
+      {
+        fileId,
+        mimeType: "text/plain"
+      },
+      {
+        responseType: "stream"
       },
       (err, res) => {
         if (err) return reject(err);
         res.data
-          .on('end', function () {
+          .on("end", () => {
             console.log(`Finished downloading ${filename}`);
             resolve();
           })
-          .on('error', function (err) {
+          .on("error", (err) => {
             reject(new Error(`Error during downloading ${filename}: ${err}`));
           })
           .pipe(dest);
