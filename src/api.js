@@ -1,13 +1,13 @@
 const { readdir } = require("fs");
 const { join } = require("path");
-const { ESSAYS_PATH, DETAILS_PATH, INDEX_PATH } = require("../config.js");
+const { ESSAYS_PATH, DETAILS_PATH, COLLECTION_PATH } = require("../config.js");
 const { write, read } = require("./shared");
 
 let DETAILS;
 let ESSAYS;
 try {
   DETAILS = require(DETAILS_PATH);
-  ESSAYS = require(INDEX_PATH);
+  ESSAYS = require(COLLECTION_PATH);
 } catch (e) {
   console.error(`error loading file: ${e}`);
 }
@@ -82,7 +82,7 @@ function createIndex() {
           console.error(`entry not found: ${file}`);
         }
       }
-      write(INDEX_PATH, JSON.stringify(index));
+      write(COLLECTION_PATH, JSON.stringify(index));
     }
   });
 }

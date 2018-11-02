@@ -1,6 +1,6 @@
 const { google } = require("googleapis");
 const {
-  DETAILS_SHEETID,
+  DETAILS_SHEET_ID,
   DETAILS_RANGE,
   DETAILS_PATH
 } = require("../config.js");
@@ -17,7 +17,7 @@ function getEssaysDetails(auth) {
   });
   sheets.spreadsheets.values.get(
     {
-      spreadsheetId: DETAILS_SHEETID,
+      spreadsheetId: DETAILS_SHEET_ID,
       range: DETAILS_RANGE,
       ...OPTIONS
     },
