@@ -29,17 +29,6 @@ function initialize() {
   authorize([createIndex]);
 }
 
-function tranform(essay) {
-  delete essay.links
-  delete essay.featured
-  delete essay.email
-  // tag: selectRandom(TAGS),
-  // dateUploaded: faker.date.recent(RECENT_DAYS),
-  // imageLink: GET_IMAGE().next().value,
-  // facebookShareLink: faker.internet.url(),
-  // twitterShareLink: faker.internet.url()
-}
-
 function getEssay(id) {
   return new Promise((resolve, reject) => {
     if (!INDEX) {
@@ -50,6 +39,10 @@ function getEssay(id) {
       else resolve(essay);
     }
   });
+}
+
+function getFeatured() {
+
 }
 
 function getEssays() {
@@ -84,6 +77,10 @@ function createIndex() {
           paragraphs = paragraphs.replace(/\uFEFF/g, '')
           paragraphs = paragraphs.split(sep);
           entry.paragraphs = paragraphs;
+          delete essay.links
+          delete essay.featured
+          delete essay.email
+          // dateUploaded: faker.date.recent(RECENT_DAYS),
         } catch (error) {
           console.error(error);
         }

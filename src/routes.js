@@ -19,6 +19,10 @@ ROUTER.get('/', async (req, res, next) => {
     .json(essays);
 });
 
+ROUTER.get('/featured', async function  (req, res, next) {
+
+})
+
 ROUTER.get('/:id', async (req, res, next) => {
   let essay;
   const id = req.params.id
