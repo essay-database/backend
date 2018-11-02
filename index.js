@@ -10,7 +10,7 @@ server.on("listening", onListening);
 
 function normalizePort(val) {
   const port = parseInt(val, 10);
-  if (isNaN(port)) {
+  if (Number.isNaN(port)) {
     return val;
   }
   if (port >= 0) {

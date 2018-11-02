@@ -10,9 +10,9 @@ const CREDENTIALS_PATH = "credentials.json";
 // Load client secrets from a local file.
 function initialize(callbacks) {
   readFile(CREDENTIALS_PATH, "utf8", (err, content) => {
-    if (err) return console.error("Error loading client secret file:", err);
+    if (err) console.error("Error loading client secret file:", err);
     // Authorize a client with credentials, then call the Google Sheets API.
-    authorize(JSON.parse(content), callbacks);
+    else authorize(JSON.parse(content), callbacks);
   });
 }
 
@@ -23,17 +23,19 @@ function initialize(callbacks) {
  * @param {function} callbacks The callback to call with the authorized client.
  */
 function authorize(credentials, callbacks) {
-  const { client_secret, client_id, redirect_uris } = credentials.installed;
+  const { clientSecret, clientId, redirectUris } = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
-    client_id,
-    client_secret,
-    redirect_uris[0]
+    clientId,
+    clientSecret,
+    redirectUris[0]
   );
   // Check if we have previously stored a token.
   readFile(TOKEN_PATH, "utf8", (err, token) => {
-    if (err) return getNewToken(oAuth2Client, callbacks);
-    oAuth2Client.setCredentials(JSON.parse(token));
-    execCallbacks(callbacks, oAuth2Client);
+    if (err) getNewToken(oAuth2Client, callbacks);
+    else {
+      oAuth2Client.setCredentials(JSON.parse(token));
+      execCallbacks(callbacks, oAuth2Client);
+    }
   });
 }
 
@@ -57,26 +59,25 @@ function getNewToken(oAuth2Client, callbacks) {
     rl.close();
     oAuth2Client.getToken(code, (err, token) => {
       if (err)
-        return console.error(
-          "Error while trying to retrieve access token",
-          err
-        );
-      oAuth2Client.setCredentials(token);
-      // Store the token to disk for later program executions
-      writeFile(TOKEN_PATH, JSON.stringify(token), err => {
-        if (err) console.error(err);
-        console.log("Token stored to", TOKEN_PATH);
-      });
-      execCallbacks(callbacks, oAuth2Client);
+        console.error("Error while trying to retrieve access token", err);
+      else {
+        oAuth2Client.setCredentials(token);
+        // Store the token to disk for later program executions
+        writeFile(TOKEN_PATH, JSON.stringify(token), err => {
+          if (err) console.error(err);
+          console.log("Token stored to", TOKEN_PATH);
+        });
+        execCallbacks(callbacks, oAuth2Client);
+      }
     });
   });
 }
 
-// TODO convert to promises ?
-function execCallbacks(callbacks, oAuth2Client) {
+async function execCallbacks(callbacks, oAuth2Client) {
   callbacks.forEach(callback => {
     callback(oAuth2Client);
   });
+  // for (const callback of callbacks) await callback(oAuth2Client);
 }
 
 module.exports = initialize;

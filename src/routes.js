@@ -9,7 +9,8 @@ ROUTER.get("/", async (req, res, next) => {
   try {
     essays = await getEssays();
   } catch (err) {
-    return createError(500, error.message, next);
+    createError(500, err.message, next);
+    return;
   }
   res.status(STATUS_OK).json(essays);
 });
@@ -19,18 +20,20 @@ ROUTER.get("/featured", async (req, res, next) => {
   try {
     essays = await getFeatured();
   } catch (err) {
-    return createError(500, error.message, next);
+    createError(500, err.message, next);
+    return;
   }
   res.status(STATUS_OK).json(essays);
 });
 
 ROUTER.get("/:id", async (req, res, next) => {
   let essay;
-  const id = req.params.id;
+  const { id } = req.params;
   try {
     essay = await getEssay(id);
   } catch (error) {
-    return createError(404, error.message, next);
+    createError(404, error.message, next);
+    return;
   }
   res.status(STATUS_OK).json(essay);
 });

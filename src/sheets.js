@@ -22,15 +22,17 @@ function getEssaysDetails(auth) {
       ...OPTIONS
     },
     (err, res) => {
-      if (err) return console.error(`The API returned an error: ${err}`);
-      const rows = res.data.values;
-      if (rows.length) {
-        const data = JSON.stringify(convertObj(rows));
-        write(DETAILS_PATH, data)
-          .then(msg => console.log(msg))
-          .catch(err => console.error(err));
-      } else {
-        console.log("No data found.");
+      if (err) console.error(`The API returned an error: ${err}`);
+      else {
+        const rows = res.data.values;
+        if (rows.length) {
+          const data = JSON.stringify(convertObj(rows));
+          write(DETAILS_PATH, data)
+            .then(msg => console.log(msg))
+            .catch(err => console.error(err));
+        } else {
+          console.log("No data found.");
+        }
       }
     }
   );

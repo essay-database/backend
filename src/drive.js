@@ -20,27 +20,29 @@ function getEssaysContent(auth) {
       fields: "nextPageToken, files(id)"
     },
     (err, res) => {
-      if (err) return console.error(`API returned error: ${err}`);
-      const files = res.data.files;
-      if (files.length) {
-        downloadEssays(drive, files);
-      } else {
-        console.log("No files found.");
+      if (err) console.error(`API returned error: ${err}`);
+      else {
+        const { files } = res.data;
+        if (files.length) {
+          downloadEssays(drive, files);
+        } else {
+          console.log("No files found.");
+        }
       }
     }
   );
 }
 
 async function downloadEssays(drive, files) {
-  await Promise.all(
-    files.map(file => {
-      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`)).catch(
-        err => {
-          console.error(err);
-        }
-      );
-    })
-  );
+  try {
+    await Promise.all(
+      files.map(file =>
+        downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+      )
+    );
+  } catch (e) {
+    console.error(e);
+  }
 }
 
 function downloadEssay(drive, fileId, filename) {
@@ -55,16 +57,17 @@ function downloadEssay(drive, fileId, filename) {
         responseType: "stream"
       },
       (err, res) => {
-        if (err) return reject(err);
-        res.data
-          .on("end", () => {
-            console.log(`Finished downloading ${filename}`);
-            resolve();
-          })
-          .on("error", (err) => {
-            reject(new Error(`Error during downloading ${filename}: ${err}`));
-          })
-          .pipe(dest);
+        if (err) reject(err);
+        else
+          res.data
+            .on("end", () => {
+              console.log(`Finished downloading ${filename}`);
+              resolve();
+            })
+            .on("error", err => {
+              reject(new Error(`Error during downloading ${filename}: ${err}`));
+            })
+            .pipe(dest);
       }
     );
   });
