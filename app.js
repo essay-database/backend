@@ -12,6 +12,7 @@ app.get("/init", async (req, res, next) => {
     await initialize();
   } catch (error) {
     createError(500, error.message, next);
+    return;
   }
   res.status(STATUS_OK).send("initialize complete");
 });

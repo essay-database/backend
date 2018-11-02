@@ -4,10 +4,10 @@ const { ESSAYS_PATH, DETAILS_PATH, INDEX_PATH } = require("../config.js");
 const { write, read } = require("./shared");
 
 let DETAILS;
-let INDEX;
+let ESSAYS;
 try {
   DETAILS = require(DETAILS_PATH);
-  INDEX = require(INDEX_PATH);
+  ESSAYS = require(INDEX_PATH);
 } catch (e) {
   console.error(`error loading file: ${e}`);
 }
@@ -15,20 +15,16 @@ const authorize = require("./authorization");
 const getEssaysDetails = require("./sheets");
 const getEssaysContent = require("./drive");
 
-async function initialize() {
-  try {
-    await authorize([createIndex, getEssaysContent, getEssaysDetails]);
-  } catch (e) {
-    console.error(e);
-  }
+function initialize() {
+  return authorize([createIndex, getEssaysContent, getEssaysDetails]);
 }
 
 function getEssay(id) {
   return new Promise((resolve, reject) => {
-    if (!INDEX) {
+    if (!ESSAYS) {
       reject(Error`essays not found`);
     } else {
-      const essay = INDEX.find(essay => essay.id === id);
+      const essay = ESSAYS.find(essay => essay.id === id);
       if (!essay) reject(Error`essay not found ${id}`);
       else resolve(essay);
     }
@@ -37,17 +33,17 @@ function getEssay(id) {
 
 function getFeatured() {
   return new Promise((resolve, reject) => {
-    if (!INDEX) reject(Error("essays not found"));
-    else resolve(INDEX.filter(essay => essay.featured === true));
+    if (!ESSAYS) reject(Error("essays not found"));
+    else resolve(ESSAYS.filter(essay => essay.featured === true));
   });
 }
 
 function getEssays() {
   return new Promise((resolve, reject) => {
-    if (!INDEX) {
+    if (!ESSAYS) {
       reject(Error`essays not found`);
     } else {
-      resolve(INDEX);
+      resolve(ESSAYS);
     }
   });
 }

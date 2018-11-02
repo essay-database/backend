@@ -74,10 +74,7 @@ function getNewToken(oAuth2Client, callbacks) {
 }
 
 async function execCallbacks(callbacks, oAuth2Client) {
-  callbacks.forEach(callback => {
-    callback(oAuth2Client);
-  });
-  // for (const callback of callbacks) await callback(oAuth2Client);
+  for (const callback of callbacks) await callback(oAuth2Client);
 }
 
 module.exports = initialize;
