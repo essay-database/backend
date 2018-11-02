@@ -29,32 +29,16 @@ function initialize() {
   authorize([createIndex]);
 }
 
-function createIndex() {
-  const index = DETAILS;
-  readdir(ESSAYS_PATH, async (err, files) => {
-    if (err) return reject(err);
-    files = files.filter(file => file.endsWith('.txt'));
-    for (const file of files) {
-      const entry = index.find(detail => file.includes(detail.id));
-      if (entry) {
-        try {
-          const essay = await read(join(ESSAYS_PATH, file));
-          const sep = '||';
-          let paragraphs = essay.replace(/[\n\r]+/g, sep);
-          paragraphs = paragraphs.replace(/\uFEFF/g, '')
-          paragraphs = paragraphs.split(sep);
-          entry.paragraphs = paragraphs;
-        } catch (error) {
-          console.error(error);
-        }
-      } else {
-        console.error(`entry not found: ${file}`);
-      }
-    }
-    write(INDEX_PATH, JSON.stringify(index));
-  });
+function tranform(essay) {
+  delete essay.links
+  delete essay.featured
+  delete essay.email
+  // tag: selectRandom(TAGS),
+  // dateUploaded: faker.date.recent(RECENT_DAYS),
+  // imageLink: GET_IMAGE().next().value,
+  // facebookShareLink: faker.internet.url(),
+  // twitterShareLink: faker.internet.url()
 }
-
 
 function getEssay(id) {
   return new Promise((resolve, reject) => {
@@ -83,6 +67,32 @@ function createError(status, message, next) {
   error.status = status;
   if (next) return next(error);
   else return error;
+}
+
+function createIndex() {
+  const index = DETAILS;
+  readdir(ESSAYS_PATH, async (err, files) => {
+    if (err) return reject(err);
+    files = files.filter(file => file.endsWith('.txt'));
+    for (const file of files) {
+      const entry = index.find(detail => file.includes(detail.id));
+      if (entry) {
+        try {
+          const essay = await read(join(ESSAYS_PATH, file));
+          const sep = '||';
+          let paragraphs = essay.replace(/[\n\r]+/g, sep);
+          paragraphs = paragraphs.replace(/\uFEFF/g, '')
+          paragraphs = paragraphs.split(sep);
+          entry.paragraphs = paragraphs;
+        } catch (error) {
+          console.error(error);
+        }
+      } else {
+        console.error(`entry not found: ${file}`);
+      }
+    }
+    write(INDEX_PATH, JSON.stringify(index));
+  });
 }
 
 module.exports = {
