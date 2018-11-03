@@ -14,23 +14,18 @@ function getEssaysContent(auth) {
     version: "v3",
     auth
   });
-
   return new Promise((resolve, reject) => {
     drive.files.list(
       {
         ...OPTIONS,
         fields: "nextPageToken, files(id)"
       },
-      async (err, res) => {
-        if (err) resolve(Error`API returned error: ${err}`);
+      (err, res) => {
+        if (err) reject(Error`API returned error: ${err}`);
         else {
           const { files } = res.data;
           if (files && files.length) {
-            try {
-              await downloadEssays(drive, files);
-            } catch (error) {
-              reject(error);
-            }
+            resolve(downloadEssays(drive, files));
           } else {
             reject(Error("No files found."));
           }

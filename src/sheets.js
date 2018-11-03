@@ -15,27 +15,27 @@ function getEssaysDetails(auth) {
     version: "v4",
     auth
   });
-  sheets.spreadsheets.values.get(
-    {
-      spreadsheetId: DETAILS_SHEET_ID,
-      range: DETAILS_RANGE,
-      ...OPTIONS
-    },
-    (err, res) => {
-      if (err) console.error(`The API returned an error: ${err}`);
-      else {
-        const rows = res.data.values;
-        if (rows.length) {
-          const data = JSON.stringify(convertObj(rows));
-          write(DETAILS_PATH, data)
-            .then(msg => console.log(msg))
-            .catch(err => console.error(err));
-        } else {
-          console.log("No data found.");
+  return new Promise((resolve, reject) => {
+    sheets.spreadsheets.values.get(
+      {
+        spreadsheetId: DETAILS_SHEET_ID,
+        range: DETAILS_RANGE,
+        ...OPTIONS
+      },
+      (err, res) => {
+        if (err) reject(Error`The API returned an error: ${err}`);
+        else {
+          const rows = res.data.values;
+          if (rows && rows.length) {
+            const data = JSON.stringify(convertObj(rows));
+            resolve(write(DETAILS_PATH, data));
+          } else {
+            reject(Error("No data found."));
+          }
         }
       }
-    }
-  );
+    );
+  });
 }
 
 function convertObj(rows) {

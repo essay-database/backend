@@ -70,22 +70,20 @@ function getNewToken(oAuth2Client, callbacks) {
           oAuth2Client.setCredentials(token);
           // Store the token to disk for later program executions
           writeFile(TOKEN_PATH, JSON.stringify(token), err => {
-            if (err) reject(Error("Token stored to", TOKEN_PATH));
+            if (err) reject(err);
+            else {
+              console.log("Token stored to", TOKEN_PATH);
+              resolve(execCallbacks(callbacks, oAuth2Client));
+            }
           });
-          resolve(execCallbacks(callbacks, oAuth2Client));
         }
       });
     });
   });
 }
 
-async function execCallbacks(callbacks, oAuth2Client) {
-  try {
-    for (const callback of callbacks) await callback(oAuth2Client);
-    return;
-  } catch (e) {
-    return e;
-  }
+function execCallbacks(callbacks, oAuth2Client) {
+  return Promise.all(callbacks.map(callback => callback(oAuth2Client)));
 }
 
 module.exports = initialize;
