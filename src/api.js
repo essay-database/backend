@@ -16,7 +16,7 @@ const getEssaysDetails = require("./sheets");
 const getEssaysContent = require("./drive");
 
 function initialize() {
-  return authorize([createIndex, getEssaysContent, getEssaysDetails]);
+  return authorize([getEssaysContent, getEssaysDetails, createIndex]);
 }
 
 function getEssay(id) {

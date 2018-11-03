@@ -27,7 +27,7 @@ function getEssaysContent(auth) {
           if (files && files.length) {
             resolve(downloadEssays(drive, files));
           } else {
-            reject(Error("No files found."));
+            reject(Error("no files found."));
           }
         }
       }
@@ -36,10 +36,11 @@ function getEssaysContent(auth) {
 }
 
 function downloadEssays(drive, files) {
-  const promises = files.map(file =>
-    downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+  return Promise.all(
+    files.map(file =>
+      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+    )
   );
-  return Promise.all(promises);
 }
 
 function downloadEssay(drive, fileId, filename) {

@@ -26,7 +26,11 @@ function initialize(callbacks) {
  * @param {function} callbacks The callback to call with the authorized client.
  */
 function authorize(credentials, callbacks) {
-  const { clientSecret, clientId, redirectUris } = credentials.installed;
+  const {
+    client_secret: clientSecret,
+    client_id: clientId,
+    redirect_uris: redirectUris
+  } = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
     clientId,
     clientSecret,

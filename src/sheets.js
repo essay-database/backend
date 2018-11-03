@@ -23,14 +23,14 @@ function getEssaysDetails(auth) {
         ...OPTIONS
       },
       (err, res) => {
-        if (err) reject(Error`The API returned an error: ${err}`);
+        if (err) reject(Error`API returned an error: ${err}`);
         else {
           const rows = res.data.values;
           if (rows && rows.length) {
             const data = JSON.stringify(convertObj(rows));
             resolve(write(DETAILS_PATH, data));
           } else {
-            reject(Error("No data found."));
+            reject(Error("no data found."));
           }
         }
       }
