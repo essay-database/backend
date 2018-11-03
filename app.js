@@ -14,7 +14,7 @@ app.get("/init", async (req, res, next) => {
     createError(500, error.message, next);
     return;
   }
-  res.status(STATUS_OK).send("initialize complete");
+  res.status(STATUS_OK).json("ok");
 });
 
 app.use("/essays", essaysRouter);
@@ -29,7 +29,7 @@ app.use((err, req, res, next) => {
   if (res.headersSent) {
     next(err);
   } else {
-    // console.error(err);
+    console.error(err);
     res.status(err.status || 500);
     res.send("an error occured");
   }

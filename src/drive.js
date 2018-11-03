@@ -25,7 +25,12 @@ function getEssaysContent(auth) {
         else {
           const { files } = res.data;
           if (files && files.length) {
-            resolve(downloadEssays(drive, files));
+            downloadEssays(drive, files)
+              .then(msgs => {
+                msgs.forEach(msg => console.log(msg));
+                resolve("download complete");
+              })
+              .catch(err => reject(err));
           } else {
             reject(Error("no files found."));
           }

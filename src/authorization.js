@@ -14,7 +14,11 @@ function initialize(callbacks) {
       if (err)
         reject(Error(`Error loading client secret file: ${err.message}`));
       // Authorize a client with credentials, then call the Google Sheets API.
-      else resolve(authorize(JSON.parse(content), callbacks));
+      else {
+        authorize(JSON.parse(content), callbacks)
+          .then(msg => resolve(msg))
+          .catch(err => reject(err));
+      }
     });
   });
 }
@@ -36,13 +40,18 @@ function authorize(credentials, callbacks) {
     clientSecret,
     redirectUris[0]
   );
-  return new Promise(resolve => {
+  return new Promise((resolve, reject) => {
     // Check if we have previously stored a token.
     readFile(TOKEN_PATH, "utf8", (err, token) => {
-      if (err) resolve(getNewToken(oAuth2Client, callbacks));
-      else {
+      if (err) {
+        getNewToken(oAuth2Client, callbacks)
+          .then(msg => resolve(msg))
+          .catch(err => reject(err));
+      } else {
         oAuth2Client.setCredentials(JSON.parse(token));
-        resolve(execCallbacks(callbacks, oAuth2Client));
+        execCallbacks(callbacks, oAuth2Client)
+          .then(msg => resolve(msg))
+          .catch(err => reject(err));
       }
     });
   });
@@ -77,7 +86,9 @@ function getNewToken(oAuth2Client, callbacks) {
             if (err) reject(err);
             else {
               console.log("Token stored to", TOKEN_PATH);
-              resolve(execCallbacks(callbacks, oAuth2Client));
+              execCallbacks(callbacks, oAuth2Client)
+                .then(msg => resolve(msg))
+                .catch(err => reject(err));
             }
           });
         }

@@ -9,14 +9,18 @@ try {
   DETAILS = require(DETAILS_PATH);
   ESSAYS = require(COLLECTION_PATH);
 } catch (e) {
-  console.error(`error loading file: ${e}`);
+  console.error(`error loading file: ${e}`); // should not throw error
 }
 const authorize = require("./authorization");
 const getEssaysDetails = require("./sheets");
 const getEssaysContent = require("./drive");
 
 function initialize() {
-  return authorize([getEssaysContent, getEssaysDetails, createIndex]);
+  return new Promise((resolve, reject) => {
+    authorize([getEssaysContent, getEssaysDetails, createIndex])
+      .then(msg => resolve(msg))
+      .catch(err => reject(err));
+  });
 }
 
 function getEssay(id) {
@@ -71,9 +75,9 @@ function createIndex() {
             paragraphs = paragraphs.replace(/\uFEFF/g, "");
             paragraphs = paragraphs.split(sep);
             entry.paragraphs = paragraphs;
-            delete essay.links;
-            delete essay.featured;
-            delete essay.email;
+            // delete essay.links;
+            // delete essay.featured;
+            // delete essay.email;
             // dateUploaded: faker.date.recent(RECENT_DAYS),
           } catch (error) {
             console.error(error);

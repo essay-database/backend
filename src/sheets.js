@@ -28,7 +28,9 @@ function getEssaysDetails(auth) {
           const rows = res.data.values;
           if (rows && rows.length) {
             const data = JSON.stringify(convertObj(rows));
-            resolve(write(DETAILS_PATH, data));
+            write(DETAILS_PATH, data)
+              .then(msg => resolve(msg))
+              .catch(err => reject(err));
           } else {
             reject(Error("no data found."));
           }
