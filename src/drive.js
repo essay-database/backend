@@ -28,7 +28,7 @@ function getEssaysContent(auth) {
             downloadEssays(drive, files)
               .then(msgs => {
                 msgs.forEach(msg => console.log(msg));
-                resolve("download complete");
+                resolve("file downloads complete");
               })
               .catch(err => reject(err));
           } else {

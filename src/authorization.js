@@ -50,7 +50,10 @@ function authorize(credentials, callbacks) {
       } else {
         oAuth2Client.setCredentials(JSON.parse(token));
         execCallbacks(callbacks, oAuth2Client)
-          .then(msg => resolve(msg))
+          .then(msgs => {
+            msgs.forEach(console.log);
+            resolve("executed all callbacks");
+          })
           .catch(err => reject(err));
       }
     });
@@ -87,7 +90,10 @@ function getNewToken(oAuth2Client, callbacks) {
             else {
               console.log("Token stored to", TOKEN_PATH);
               execCallbacks(callbacks, oAuth2Client)
-                .then(msg => resolve(msg))
+                .then(msgs => {
+                  msgs.forEach(console.log);
+                  resolve("executed all callbacks");
+                })
                 .catch(err => reject(err));
             }
           });

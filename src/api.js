@@ -61,15 +61,30 @@ function createError(status, message, next) {
 
 function createIndex() {
   const index = DETAILS;
-  readdir(ESSAYS_PATH, async (err, files) => {
-    if (err) console.error(err);
-    else {
-      const filesFiltered = files.filter(file => file.endsWith(".txt"));
-      for (const file of filesFiltered) {
-        const entry = index.find(detail => file.includes(detail.id));
-        if (entry) {
-          try {
-            const essay = await read(join(ESSAYS_PATH, file));
+  return new Promise((resolve, reject) => {
+    readdir(ESSAYS_PATH, (err, files) => {
+      if (err) reject(err);
+      else {
+        createIndexHelper(files.filter(file => file.endsWith(".txt")), index)
+          .then(msg => {
+            console.log(msg);
+            write(COLLECTION_PATH, JSON.stringify(index))
+              .then(msg => resolve(msg))
+              .catch(err => reject(err));
+          })
+          .catch(err => resolve(err));
+      }
+    });
+  });
+}
+
+function createIndexHelper(files, index) {
+  return new Promise((resolve, reject) => {
+    for (const file of files) {
+      const entry = index.find(detail => file.includes(detail.id));
+      if (entry)
+        read(join(ESSAYS_PATH, file))
+          .then(essay => {
             const sep = "||";
             let paragraphs = essay.replace(/[\n\r]+/g, sep);
             paragraphs = paragraphs.replace(/\uFEFF/g, "");
@@ -79,15 +94,11 @@ function createIndex() {
             // delete essay.featured;
             // delete essay.email;
             // dateUploaded: faker.date.recent(RECENT_DAYS),
-          } catch (error) {
-            console.error(error);
-          }
-        } else {
-          console.error(`entry not found: ${file}`);
-        }
-      }
-      write(COLLECTION_PATH, JSON.stringify(index));
+          })
+          .catch(err => reject(err));
+      else reject(Error`entry not found: ${file}`);
     }
+    resolve("complete");
   });
 }
 
