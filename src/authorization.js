@@ -16,7 +16,7 @@ function initialize(callbacks) {
       // Authorize a client with credentials, then call the Google Sheets API.
       else {
         authorize(JSON.parse(content), callbacks)
-          .then(msg => resolve(msg))
+          .then(msgs => resolve(msgs))
           .catch(err => reject(err));
       }
     });
@@ -45,7 +45,7 @@ function authorize(credentials, callbacks) {
     readFile(TOKEN_PATH, "utf8", (err, token) => {
       if (err) {
         getNewToken(oAuth2Client, callbacks)
-          .then(msg => resolve(msg))
+          .then(msgs => resolve(msgs))
           .catch(err => reject(err));
       } else {
         oAuth2Client.setCredentials(JSON.parse(token));

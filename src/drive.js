@@ -9,7 +9,7 @@ const OPTIONS = {
   q: `'${ESSAY_FOLDER_ID}' in parents`
 };
 
-function fetchEssaysContent(auth) {
+function fetchEssaysText(auth) {
   const drive = google.drive({
     version: "v3",
     auth
@@ -72,4 +72,4 @@ function downloadEssay(drive, fileId, filename) {
   });
 }
 
-module.exports = fetchEssaysContent;
+module.exports = fetchEssaysText;

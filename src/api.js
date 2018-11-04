@@ -8,7 +8,7 @@ let ESSAYS_DATA;
 
 const authorize = require("./authorization");
 // const fetchEssaysDetails = require("./sheets");
-// const fetchEssaysContent = require("./drive");
+// const fetchEssaysText = require("./drive");
 
 function load() {
   try {
@@ -94,7 +94,7 @@ function compileEssay(fileName, data) {
       read(join(ESSAYS_PATH, fileName))
         .then(essayText => resolve(format(essay, essayText)))
         .catch(err => reject(err));
-    else reject(Error("entry not found"));
+    else reject(Error("essay not found"));
   });
 }
 
