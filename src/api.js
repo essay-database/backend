@@ -5,17 +5,22 @@ const { write, read } = require("./shared");
 
 let SPREADSHEET;
 let ESSAYS;
-try {
-  SPREADSHEET = require(SPREADSHEET_FILE);
-  ESSAYS = require(ESSAYS_FILE);
-} catch (e) {
-  console.error(`error loading file: ${e}`); // should not throw error
-}
+
 const authorize = require("./authorization");
 const getEssaysDetails = require("./sheets");
 const getEssaysContent = require("./drive");
 
+function loadFiles() {
+  try {
+    SPREADSHEET = require(SPREADSHEET_FILE);
+    ESSAYS = require(ESSAYS_FILE);
+  } catch (e) {
+    console.error(`error loading file: ${e}`);
+  }
+}
+
 function initialize() {
+  loadFiles();
   return new Promise((resolve, reject) => {
     authorize([getEssaysContent, getEssaysDetails, createEssays])
       .then(msgs => resolve(msgs))
@@ -67,8 +72,8 @@ function createEssays() {
 }
 
 function formatFile(file, index) {
+  const entry = index.find(detail => file.includes(detail.id));
   return new Promise((resolve, reject) => {
-    const entry = index.find(detail => file.includes(detail.id));
     if (entry)
       read(join(ESSAYS_PATH, file))
         .then(essay => {
