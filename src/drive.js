@@ -40,7 +40,9 @@ function fetchEssaysText(auth) {
 function downloadEssays(drive, files) {
   return Promise.all(
     files.map(file =>
-      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`)).catch(
+        err => err
+      )
     )
   );
 }
