@@ -3,26 +3,26 @@ const { join } = require("path");
 const { ESSAYS_PATH, SPREADSHEET_FILE, ESSAYS_FILE } = require("../config.js");
 const { write, read } = require("./shared");
 
-let SPREADSHEET;
-let ESSAYS;
+let SPREADSHEET_DATA;
+let ESSAYS_DATA;
 
 const authorize = require("./authorization");
-const getEssaysDetails = require("./sheets");
-const getEssaysContent = require("./drive");
+// const fetchEssaysDetails = require("./sheets");
+// const fetchEssaysContent = require("./drive");
 
-function loadFiles() {
+function load() {
   try {
-    SPREADSHEET = require(SPREADSHEET_FILE);
-    ESSAYS = require(ESSAYS_FILE);
+    SPREADSHEET_DATA = require(SPREADSHEET_FILE);
+    ESSAYS_DATA = require(ESSAYS_FILE);
   } catch (e) {
     console.error(`error loading file: ${e}`);
   }
 }
 
 function initialize() {
-  loadFiles();
+  load();
   return new Promise((resolve, reject) => {
-    authorize([getEssaysContent, getEssaysDetails, createEssays])
+    authorize([createEssaysData])
       .then(msgs => resolve(msgs))
       .catch(err => reject(err));
   });
@@ -30,39 +30,42 @@ function initialize() {
 
 function getEssay(id) {
   return new Promise((resolve, reject) => {
-    if (!ESSAYS) {
+    if (!ESSAYS_DATA) {
       reject(Error`essays not found`);
     } else {
-      const essay = ESSAYS.find(essay => essay.id === id);
+      const essay = ESSAYS_DATA.find(essay => essay.id === id);
       if (!essay) reject(Error`essay not found ${id}`);
       else resolve(essay);
     }
   });
 }
 
-function getFeatured() {
+function getFeaturedEssays() {
   return new Promise((resolve, reject) => {
-    if (!ESSAYS) reject(Error("essays not found"));
-    else resolve(ESSAYS.filter(essay => essay.featured === true));
+    if (!ESSAYS_DATA) reject(Error("essays not found"));
+    else resolve(ESSAYS_DATA.filter(essay => essay.featured === true));
   });
 }
 
 function getEssays() {
   return new Promise((resolve, reject) => {
-    if (!ESSAYS) {
+    if (!ESSAYS_DATA) {
       reject(Error`essays not found`);
     } else {
-      resolve(ESSAYS);
+      resolve(ESSAYS_DATA);
     }
   });
 }
 
-function createEssays() {
+function createEssaysData() {
   return new Promise((resolve, reject) => {
-    readdir(ESSAYS_PATH, (err, files) => {
+    readdir(ESSAYS_PATH, (err, fileNames) => {
       if (err) reject(err);
       else {
-        formatFiles(files.filter(file => file.endsWith(".txt")), SPREADSHEET)
+        compileEssays(
+          fileNames.filter(file => file.endsWith(".txt")),
+          SPREADSHEET_DATA
+        )
           .then(files => write(ESSAYS_FILE, JSON.stringify(files)))
           .then(msg => resolve(msg))
           .catch(err => resolve(err));
@@ -71,30 +74,32 @@ function createEssays() {
   });
 }
 
-function formatFile(file, index) {
-  const entry = index.find(detail => file.includes(detail.id));
+function format(essay, essayText) {
+  const sep = "||";
+  let paragraphs = essayText.replace(/[\n\r]+/g, sep);
+  paragraphs = paragraphs.replace(/\uFEFF/g, "");
+  paragraphs = paragraphs.split(sep);
+  essay.paragraphs = paragraphs;
+  delete essay.links;
+  delete essay.featured;
+  delete essay.email;
+  essay.dateUploaded = new Date();
+  return essay;
+}
+
+function compileEssay(fileName, data) {
   return new Promise((resolve, reject) => {
-    if (entry)
-      read(join(ESSAYS_PATH, file))
-        .then(essay => {
-          const sep = "||";
-          let paragraphs = essay.replace(/[\n\r]+/g, sep);
-          paragraphs = paragraphs.replace(/\uFEFF/g, "");
-          paragraphs = paragraphs.split(sep);
-          entry.paragraphs = paragraphs;
-          // delete essay.links;
-          // delete essay.featured;
-          // delete essay.email;
-          // dateUploaded: faker.date.recent(RECENT_DAYS)
-          resolve(essay);
-        })
+    const essay = data.find(detail => fileName.includes(detail.id));
+    if (essay)
+      read(join(ESSAYS_PATH, fileName))
+        .then(essayText => resolve(format(essay, essayText)))
         .catch(err => reject(err));
     else reject(Error("entry not found"));
   });
 }
 
-function formatFiles(files, index) {
-  return Promise.all(files.map(file => formatFile(file, index)));
+function compileEssays(files, data) {
+  return Promise.all(files.map(file => compileEssay(file, data)));
 }
 
 function createError(status, message, next) {
@@ -109,5 +114,5 @@ module.exports = {
   getEssays,
   createError,
   initialize,
-  getFeatured
+  getFeaturedEssays
 };

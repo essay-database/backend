@@ -10,7 +10,7 @@ const OPTIONS = {
   valueRenderOption: "UNFORMATTED_VALUE"
 };
 
-function getEssaysDetails(auth) {
+function fetchEssaysDetails(auth) {
   const sheets = google.sheets({
     version: "v4",
     auth
@@ -57,4 +57,4 @@ function convertObj(rows) {
   return results;
 }
 
-module.exports = getEssaysDetails;
+module.exports = fetchEssaysDetails;

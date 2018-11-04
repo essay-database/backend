@@ -1,5 +1,10 @@
 const express = require("express");
-const { getEssay, getEssays, createError, getFeatured } = require("./api");
+const {
+  getEssay,
+  getEssays,
+  createError,
+  getFeaturedEssays
+} = require("./api");
 
 const ROUTER = express.Router();
 const STATUS_OK = 200;
@@ -18,7 +23,7 @@ ROUTER.get("/", async (req, res, next) => {
 ROUTER.get("/featured", async (req, res, next) => {
   let essays;
   try {
-    essays = await getFeatured();
+    essays = await getFeaturedEssays();
   } catch (err) {
     createError(500, err.message, next);
     return;
