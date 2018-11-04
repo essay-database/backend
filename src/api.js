@@ -60,46 +60,43 @@ function createError(status, message, next) {
 }
 
 function createIndex() {
-  const index = DETAILS;
   return new Promise((resolve, reject) => {
     readdir(ESSAYS_PATH, (err, files) => {
       if (err) reject(err);
       else {
-        createIndexHelper(files.filter(file => file.endsWith(".txt")), index)
-          .then(msg => {
-            console.log(msg);
-            write(COLLECTION_PATH, JSON.stringify(index))
-              .then(msg => resolve(msg))
-              .catch(err => reject(err));
-          })
+        formatFiles(files.filter(file => file.endsWith(".txt")), DETAILS)
+          .then(files => write(COLLECTION_PATH, JSON.stringify(files)))
+          .then(msg => resolve(msg))
           .catch(err => resolve(err));
       }
     });
   });
 }
 
-function createIndexHelper(files, index) {
+function formatFile(file, index) {
   return new Promise((resolve, reject) => {
-    for (const file of files) {
-      const entry = index.find(detail => file.includes(detail.id));
-      if (entry)
-        read(join(ESSAYS_PATH, file))
-          .then(essay => {
-            const sep = "||";
-            let paragraphs = essay.replace(/[\n\r]+/g, sep);
-            paragraphs = paragraphs.replace(/\uFEFF/g, "");
-            paragraphs = paragraphs.split(sep);
-            entry.paragraphs = paragraphs;
-            // delete essay.links;
-            // delete essay.featured;
-            // delete essay.email;
-            // dateUploaded: faker.date.recent(RECENT_DAYS),
-          })
-          .catch(err => reject(err));
-      else reject(Error`entry not found: ${file}`);
-    }
-    resolve("complete");
+    const entry = index.find(detail => file.includes(detail.id));
+    if (entry)
+      read(join(ESSAYS_PATH, file))
+        .then(essay => {
+          const sep = "||";
+          let paragraphs = essay.replace(/[\n\r]+/g, sep);
+          paragraphs = paragraphs.replace(/\uFEFF/g, "");
+          paragraphs = paragraphs.split(sep);
+          entry.paragraphs = paragraphs;
+          // delete essay.links;
+          // delete essay.featured;
+          // delete essay.email;
+          // dateUploaded: faker.date.recent(RECENT_DAYS)
+          resolve(essay);
+        })
+        .catch(err => reject(err));
+    else reject(Error("entry not found"));
   });
+}
+
+function formatFiles(files, index) {
+  return Promise.all(files.map(file => formatFile(file, index)));
 }
 
 module.exports = {
