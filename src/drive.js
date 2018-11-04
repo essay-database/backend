@@ -5,7 +5,7 @@ const { ESSAY_FOLDER_ID, ESSAYS_PATH } = require("../config.js");
 
 const OPTIONS = {
   orderBy: `createdTime desc`,
-  pageSize: 12,
+  pageSize: 15,
   q: `'${ESSAY_FOLDER_ID}' in parents`
 };
 
@@ -21,7 +21,7 @@ function fetchEssaysText(auth) {
         fields: "nextPageToken, files(id)"
       },
       (err, res) => {
-        if (err) reject(Error`API returned error: ${err}`);
+        if (err) reject(Error`API returned error: ${err.message + err.stack}`);
         else {
           const { files } = res.data;
           if (files && files.length) {

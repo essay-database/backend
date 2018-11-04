@@ -7,7 +7,7 @@ let SPREADSHEET_DATA;
 let ESSAYS_DATA;
 
 const authorize = require("./authorization");
-// const fetchEssaysDetails = require("./sheets");
+const fetchEssaysDetails = require("./sheets");
 const fetchEssaysText = require("./drive");
 
 function load() {
