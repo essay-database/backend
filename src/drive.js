@@ -21,7 +21,7 @@ function fetchEssaysText(auth) {
         fields: "nextPageToken, files(id)"
       },
       (err, res) => {
-        if (err) reject(Error`API returned error: ${err.message + err.stack}`);
+        if (err) reject(err);
         else {
           const { files } = res.data;
           if (files && files.length) {
@@ -40,14 +40,7 @@ function fetchEssaysText(auth) {
 function downloadEssays(drive, files) {
   return Promise.all(
     files.map(file =>
-      downloadEssay(
-        drive,
-        file.id,
-        join(ESSAYS_PATH, `${file.id}.txt`).catch(err => {
-          console.error(err);
-          return "";
-        })
-      )
+      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
     )
   );
 }

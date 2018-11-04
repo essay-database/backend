@@ -99,14 +99,7 @@ function compileEssay(fileName, data) {
 }
 
 function compileEssays(files, data) {
-  return Promise.all(
-    files.map(file =>
-      compileEssay(file, data).catch(err => {
-        console.error(err);
-        return {};
-      })
-    )
-  );
+  return Promise.all(files.map(file => compileEssay(file, data)));
 }
 
 function createError(status, message, next) {

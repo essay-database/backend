@@ -23,7 +23,7 @@ function fetchEssaysDetails(auth) {
         ...OPTIONS
       },
       (err, res) => {
-        if (err) reject(Error`API returned an error: ${err}`);
+        if (err) reject(err);
         else {
           const rows = res.data.values;
           if (rows && rows.length) {
