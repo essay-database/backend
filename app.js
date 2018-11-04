@@ -11,6 +11,7 @@ app.get("/init", async (req, res, next) => {
   let msgs;
   try {
     msgs = await initialize();
+    console.log(msgs);
   } catch (error) {
     createError(500, error.message, next);
     return;

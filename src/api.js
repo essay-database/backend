@@ -94,12 +94,19 @@ function compileEssay(fileName, data) {
       read(join(ESSAYS_PATH, fileName))
         .then(essayText => resolve(format(essay, essayText)))
         .catch(err => reject(err));
-    else reject(Error("essay not found"));
+    else reject(Error(`essay not found: ${fileName}`));
   });
 }
 
 function compileEssays(files, data) {
-  return Promise.all(files.map(file => compileEssay(file, data)));
+  return Promise.all(
+    files.map(file =>
+      compileEssay(file, data).catch(err => {
+        console.error(err);
+        return {};
+      })
+    )
+  );
 }
 
 function createError(status, message, next) {

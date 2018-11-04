@@ -5,7 +5,7 @@ const { ESSAY_FOLDER_ID, ESSAYS_PATH } = require("../config.js");
 
 const OPTIONS = {
   orderBy: `createdTime desc`,
-  pageSize: 12,
+  pageSize: 13,
   q: `'${ESSAY_FOLDER_ID}' in parents`
 };
 
