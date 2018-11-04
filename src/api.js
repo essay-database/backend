@@ -7,7 +7,7 @@ let SPREADSHEET_DATA;
 let ESSAYS_DATA;
 
 const authorize = require("./authorization");
-const fetchEssaysDetails = require("./sheets");
+// const fetchEssaysDetails = require("./sheets");
 const fetchEssaysText = require("./drive");
 
 function load() {
@@ -22,7 +22,7 @@ function load() {
 function initialize() {
   load();
   return new Promise((resolve, reject) => {
-    authorize([fetchEssaysText])
+    authorize([fetchEssaysText, createEssaysData])
       .then(msgs => resolve(msgs))
       .catch(err => reject(err));
   });
