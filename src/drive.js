@@ -5,7 +5,7 @@ const { ESSAY_FOLDER_ID, ESSAYS_PATH } = require("../config.js");
 
 const OPTIONS = {
   orderBy: `createdTime desc`,
-  pageSize: 13,
+  pageSize: 12,
   q: `'${ESSAY_FOLDER_ID}' in parents`
 };
 
@@ -40,7 +40,14 @@ function fetchEssaysText(auth) {
 function downloadEssays(drive, files) {
   return Promise.all(
     files.map(file =>
-      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+      downloadEssay(
+        drive,
+        file.id,
+        join(ESSAYS_PATH, `${file.id}.txt`).catch(err => {
+          console.error(err);
+          return "";
+        })
+      )
     )
   );
 }
