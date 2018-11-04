@@ -1,13 +1,13 @@
 const { readdir } = require("fs");
 const { join } = require("path");
-const { ESSAYS_PATH, DETAILS_PATH, COLLECTION_PATH } = require("../config.js");
+const { ESSAYS_PATH, SPREADSHEET_FILE, ESSAYS_FILE } = require("../config.js");
 const { write, read } = require("./shared");
 
-let DETAILS;
+let SPREADSHEET;
 let ESSAYS;
 try {
-  DETAILS = require(DETAILS_PATH);
-  ESSAYS = require(COLLECTION_PATH);
+  SPREADSHEET = require(SPREADSHEET_FILE);
+  ESSAYS = require(ESSAYS_FILE);
 } catch (e) {
   console.error(`error loading file: ${e}`); // should not throw error
 }
@@ -17,8 +17,8 @@ const getEssaysContent = require("./drive");
 
 function initialize() {
   return new Promise((resolve, reject) => {
-    authorize([getEssaysContent, getEssaysDetails, createIndex])
-      .then(msg => resolve(msg))
+    authorize([getEssaysContent, getEssaysDetails, createEssays])
+      .then(msgs => resolve(msgs))
       .catch(err => reject(err));
   });
 }
@@ -52,20 +52,13 @@ function getEssays() {
   });
 }
 
-function createError(status, message, next) {
-  const error = new Error(message);
-  error.status = status;
-  if (next) return next(error);
-  return error;
-}
-
-function createIndex() {
+function createEssays() {
   return new Promise((resolve, reject) => {
     readdir(ESSAYS_PATH, (err, files) => {
       if (err) reject(err);
       else {
-        formatFiles(files.filter(file => file.endsWith(".txt")), DETAILS)
-          .then(files => write(COLLECTION_PATH, JSON.stringify(files)))
+        formatFiles(files.filter(file => file.endsWith(".txt")), SPREADSHEET)
+          .then(files => write(ESSAYS_FILE, JSON.stringify(files)))
           .then(msg => resolve(msg))
           .catch(err => resolve(err));
       }
@@ -97,6 +90,13 @@ function formatFile(file, index) {
 
 function formatFiles(files, index) {
   return Promise.all(files.map(file => formatFile(file, index)));
+}
+
+function createError(status, message, next) {
+  const error = new Error(message);
+  error.status = status;
+  if (next) return next(error);
+  return error;
 }
 
 module.exports = {

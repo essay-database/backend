@@ -8,13 +8,14 @@ app.use(express.json());
 const STATUS_OK = 200;
 
 app.get("/init", async (req, res, next) => {
+  let msgs;
   try {
-    await initialize();
+    msgs = await initialize();
   } catch (error) {
     createError(500, error.message, next);
     return;
   }
-  res.status(STATUS_OK).json("ok");
+  res.status(STATUS_OK).json(msgs);
 });
 
 app.use("/essays", essaysRouter);

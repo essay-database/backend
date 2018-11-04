@@ -26,10 +26,7 @@ function getEssaysContent(auth) {
           const { files } = res.data;
           if (files && files.length) {
             downloadEssays(drive, files)
-              .then(msgs => {
-                msgs.forEach(msg => console.log(msg));
-                resolve("file downloads complete");
-              })
+              .then(msgs => resolve(msgs))
               .catch(err => reject(err));
           } else {
             reject(Error("no files found."));

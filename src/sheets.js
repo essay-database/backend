@@ -1,8 +1,8 @@
 const { google } = require("googleapis");
 const {
-  DETAILS_SHEET_ID,
-  DETAILS_RANGE,
-  DETAILS_PATH
+  SPREADSHEET_SHEET_ID,
+  SPREADSHEET_RANGE,
+  SPREADSHEET_FILE
 } = require("../config.js");
 const { write } = require("./shared");
 
@@ -18,8 +18,8 @@ function getEssaysDetails(auth) {
   return new Promise((resolve, reject) => {
     sheets.spreadsheets.values.get(
       {
-        spreadsheetId: DETAILS_SHEET_ID,
-        range: DETAILS_RANGE,
+        spreadsheetId: SPREADSHEET_SHEET_ID,
+        range: SPREADSHEET_RANGE,
         ...OPTIONS
       },
       (err, res) => {
@@ -28,7 +28,7 @@ function getEssaysDetails(auth) {
           const rows = res.data.values;
           if (rows && rows.length) {
             const data = JSON.stringify(convertObj(rows));
-            write(DETAILS_PATH, data)
+            write(SPREADSHEET_FILE, data)
               .then(msg => resolve(msg))
               .catch(err => reject(err));
           } else {
