@@ -12,7 +12,7 @@ function read(filename) {
 function write(filename, data) {
   return new Promise((resolve, reject) => {
     writeFile(filename, data, err => {
-      if (err) reject(Error`unable to write ${filename}`);
+      if (err) reject(Error(`unable to write ${filename}`));
       else resolve(`wrote ${filename}`);
     });
   });

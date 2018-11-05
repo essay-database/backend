@@ -41,9 +41,7 @@ function fetchEssaysText(auth) {
 function downloadEssays(drive, files) {
   return Promise.all(
     files.map(file =>
-      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`)).catch(
-        () => new Error(`error downloading file: ${file.id}`)
-      )
+      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
     )
   );
 }
@@ -60,7 +58,7 @@ function downloadEssay(drive, fileId, filename) {
         responseType: "stream"
       },
       (err, res) => {
-        if (err) reject(err);
+        if (err) reject(Error(`error exporting file: ${filename}`));
         else
           res.data
             .on("end", () => {

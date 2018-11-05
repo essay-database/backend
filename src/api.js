@@ -8,7 +8,7 @@ let ESSAYS_DATA;
 
 const authorize = require("./authorization");
 // const fetchEssaysDetails = require("./sheets");
-const fetchEssaysText = require("./drive");
+// const fetchEssaysText = require("./drive");
 
 function load() {
   try {
@@ -22,7 +22,7 @@ function load() {
 function initialize() {
   load();
   return new Promise((resolve, reject) => {
-    authorize([fetchEssaysText, createEssaysData])
+    authorize([createEssaysData])
       .then(msgs => resolve(msgs))
       .catch(err => reject(err));
   });
@@ -31,10 +31,10 @@ function initialize() {
 function getEssay(id) {
   return new Promise((resolve, reject) => {
     if (!ESSAYS_DATA) {
-      reject(Error`essays not found`);
+      reject(Error(`essays not found`));
     } else {
       const essay = ESSAYS_DATA.find(essay => essay.id === id);
-      if (!essay) reject(Error`essay not found ${id}`);
+      if (!essay) reject(Error(`essay not found ${id}`));
       else resolve(essay);
     }
   });
@@ -50,7 +50,7 @@ function getFeaturedEssays() {
 function getEssays() {
   return new Promise((resolve, reject) => {
     if (!ESSAYS_DATA) {
-      reject(Error`essays not found`);
+      reject(Error(`essays not found`));
     } else {
       resolve(ESSAYS_DATA);
     }
