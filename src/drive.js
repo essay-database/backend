@@ -5,7 +5,6 @@ const { ESSAY_FOLDER_ID, ESSAYS_PATH, ESSAYS_FILE } = require("../config.js");
 const { write } = require("./shared");
 
 const ESSAYS_DATA = require(ESSAYS_FILE);
-
 const OPTIONS = {
   orderBy: `createdTime desc`,
   pageSize: 13,
@@ -80,8 +79,7 @@ function downloadEssay(drive, fileId, filename) {
       },
       (err, res) => {
         if (err) {
-          console.error(`error exporting file: ${fileId}`);
-          console.log(`retrying...`);
+          console.error(`error exporting file: ${fileId} retrying...`);
           setTimeout(
             () => resolve(downloadEssay(drive, fileId, filename)),
             100

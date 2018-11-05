@@ -10,37 +10,31 @@ const ROUTER = express.Router();
 const STATUS_OK = 200;
 
 ROUTER.get("/", async (req, res, next) => {
-  let essays;
   try {
-    essays = await getEssays();
+    const essays = await getEssays();
+    res.status(STATUS_OK).json(essays);
   } catch (err) {
     createError(500, err.message, next);
-    return;
   }
-  res.status(STATUS_OK).json(essays);
 });
 
 ROUTER.get("/featured", async (req, res, next) => {
-  let essays;
   try {
-    essays = await getFeaturedEssays();
+    const essays = await getFeaturedEssays();
+    res.status(STATUS_OK).json(essays);
   } catch (err) {
     createError(500, err.message, next);
-    return;
   }
-  res.status(STATUS_OK).json(essays);
 });
 
 ROUTER.get("/:id", async (req, res, next) => {
-  let essay;
   const { id } = req.params;
   try {
-    essay = await getEssay(id);
+    const essay = await getEssay(id);
+    res.status(STATUS_OK).json(essay);
   } catch (error) {
     createError(404, error.message, next);
-    return;
   }
-  res.status(STATUS_OK).json(essay);
 });
 
 module.exports = ROUTER;

@@ -49,7 +49,6 @@ function authorize(credentials, callbacks) {
           .catch(err => reject(err));
       } else {
         oAuth2Client.setCredentials(JSON.parse(token));
-
         execCallbacks(callbacks, oAuth2Client)
           .then(msgs => resolve(msgs))
           .catch(err => reject(err));

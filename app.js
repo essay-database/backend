@@ -5,20 +5,16 @@ const { createError, initialize } = require("./src/api");
 const app = express();
 app.use(express.json());
 
-const STATUS_OK = 200;
+app.use("/essays", essaysRouter);
 
 app.get("/init", async (req, res, next) => {
-  let msgs;
   try {
-    msgs = await initialize();
+    const msgs = await initialize();
+    res.status(200).json(msgs);
   } catch (error) {
     createError(500, error.message, next);
-    return;
   }
-  res.status(STATUS_OK).send(msgs);
 });
-
-app.use("/essays", essaysRouter);
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
