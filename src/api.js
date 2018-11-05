@@ -19,7 +19,7 @@ try {
 
 function initialize() {
   return new Promise((resolve, reject) => {
-    authorize([fetchEssaysText])
+    authorize([fetchEssaysDetails, fetchEssaysText, createEssaysData])
       .then(msgs => resolve(msgs))
       .catch(err => reject(err));
   });

@@ -30,10 +30,7 @@ function fetchEssaysText(auth) {
           const { files } = res.data;
           if (files && files.length) {
             downloadEssays(drive, files)
-              .then(msgs => {
-                msgs.forEach(console.log);
-                return files;
-              })
+              .then(() => files)
               .then(files => writeCreateTime(files))
               .then(msg => resolve(msg))
               .catch(err => reject(err));
@@ -53,7 +50,6 @@ function writeCreateTime(files) {
     if (entry) entry.dateUploaded = createdTime;
     else console.error(`entry not found: ${id}`);
   }
-
   return new Promise((resolve, reject) => {
     write(ESSAYS_FILE, JSON.stringify(data))
       .then(msg => resolve(msg))
