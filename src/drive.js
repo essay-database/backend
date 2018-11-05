@@ -30,7 +30,7 @@ function fetchEssaysText(auth) {
           const { files } = res.data;
           if (files && files.length) {
             downloadEssays(drive, files)
-              // .then(() => writeCreateTime(files))
+              .then(() => writeCreateTime(files))
               .then(msgs => resolve(msgs))
               .catch(err => reject(err));
           } else {
