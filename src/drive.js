@@ -56,14 +56,14 @@ function writeUploadDate(files) {
   });
 }
 
-function downloadEssays(drive, files) {
-  return Promise.all(
-    files.map(file =>
-      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`)).catch(
-        err => err.message
-      )
-    )
-  );
+async function downloadEssays(drive, files) {
+  const results = [];
+  for (const file of files) {
+    results.push(
+      await downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+    );
+  }
+  return results;
 }
 
 function downloadEssay(drive, fileId, filename) {

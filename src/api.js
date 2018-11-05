@@ -19,7 +19,7 @@ try {
 
 function initialize() {
   return new Promise((resolve, reject) => {
-    authorize([fetchEssaysDetails, createEssaysData, fetchEssaysText])
+    authorize([fetchEssaysText, fetchEssaysDetails, createEssaysData])
       .then(msgs => resolve(msgs))
       .catch(err => reject(err));
   });
@@ -83,10 +83,12 @@ function compileEssay(fileName, data) {
   });
 }
 
-function compileEssays(files, data) {
-  return Promise.all(
-    files.map(file => compileEssay(file, data).catch(err => err))
-  );
+async function compileEssays(files, data) {
+  const results = [];
+  for (const file of files) {
+    results.push(await compileEssay(file, data));
+  }
+  return results;
 }
 
 function createError(status, message, next) {
