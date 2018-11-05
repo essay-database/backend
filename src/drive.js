@@ -30,9 +30,8 @@ function fetchEssaysText(auth) {
           const { files } = res.data;
           if (files && files.length) {
             downloadEssays(drive, files)
-              .then(() => files)
-              .then(files => writeCreateTime(files))
-              .then(msg => resolve(msg))
+              // .then(() => writeCreateTime(files))
+              .then(msgs => resolve(msgs))
               .catch(err => reject(err));
           } else {
             reject(Error("no files found."));
