@@ -67,7 +67,7 @@ function createEssaysData() {
           SPREADSHEET_DATA
         )
           .then(files => write(ESSAYS_FILE, JSON.stringify(files)))
-          .then(msg => resolve(msg))
+          .then(msgs => resolve(msgs))
           .catch(err => resolve(err));
       }
     });

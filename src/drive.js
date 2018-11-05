@@ -5,8 +5,8 @@ const { ESSAY_FOLDER_ID, ESSAYS_PATH } = require("../config.js");
 
 const OPTIONS = {
   orderBy: `createdTime desc`,
-  pageSize: 15,
-  q: `'${ESSAY_FOLDER_ID}' in parents`
+  pageSize: 13,
+  q: `'${ESSAY_FOLDER_ID}' in parents and trashed = false`
 };
 
 function fetchEssaysText(auth) {
@@ -21,8 +21,9 @@ function fetchEssaysText(auth) {
         fields: "nextPageToken, files(id)"
       },
       (err, res) => {
-        if (err) reject(err);
-        else {
+        if (err) {
+          reject(err);
+        } else {
           const { files } = res.data;
           if (files && files.length) {
             downloadEssays(drive, files)
@@ -41,7 +42,7 @@ function downloadEssays(drive, files) {
   return Promise.all(
     files.map(file =>
       downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`)).catch(
-        err => err
+        () => new Error(`error downloading file: ${file.id}`)
       )
     )
   );
@@ -65,8 +66,8 @@ function downloadEssay(drive, fileId, filename) {
             .on("end", () => {
               resolve(`finished downloading ${filename}`);
             })
-            .on("error", err => {
-              reject(Error(`error downloading ${filename}: ${err}`));
+            .on("error", () => {
+              reject(Error(`error downloading ${filename}`));
             })
             .pipe(dest);
       }
