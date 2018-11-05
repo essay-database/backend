@@ -7,7 +7,7 @@ let SPREADSHEET_DATA;
 let ESSAYS_DATA;
 
 const authorize = require("./authorization");
-// const fetchEssaysDetails = require("./sheets");
+const fetchEssaysDetails = require("./sheets");
 const fetchEssaysText = require("./drive");
 
 try {
@@ -95,7 +95,9 @@ function compileEssay(fileName, data) {
 }
 
 function compileEssays(files, data) {
-  return Promise.all(files.map(file => compileEssay(file, data)));
+  return Promise.all(
+    files.map(file => compileEssay(file, data).catch(err => err.message))
+  );
 }
 
 function createError(status, message, next) {

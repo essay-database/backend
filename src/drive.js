@@ -30,8 +30,12 @@ function fetchEssaysText(auth) {
           const { files } = res.data;
           if (files && files.length) {
             downloadEssays(drive, files)
+              .then(msgs => {
+                msgs.forEach(console.log);
+                return files;
+              })
               .then(files => writeCreateTime(files))
-              .then(msgs => resolve(msgs))
+              .then(msg => resolve(msg))
               .catch(err => reject(err));
           } else {
             reject(Error("no files found."));
@@ -61,7 +65,7 @@ function downloadEssays(drive, files) {
   return Promise.all(
     files.map(file =>
       downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`)).catch(
-        err => err
+        err => err.message
       )
     )
   );
