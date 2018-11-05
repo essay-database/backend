@@ -49,6 +49,7 @@ function authorize(credentials, callbacks) {
           .catch(err => reject(err));
       } else {
         oAuth2Client.setCredentials(JSON.parse(token));
+
         execCallbacks(callbacks, oAuth2Client)
           .then(msgs => resolve(msgs))
           .catch(err => reject(err));
@@ -98,7 +99,9 @@ function getNewToken(oAuth2Client, callbacks) {
 }
 
 function execCallbacks(callbacks, oAuth2Client) {
-  return Promise.all(callbacks.map(callback => callback(oAuth2Client)));
+  return Promise.all(
+    callbacks.map(callback => callback(oAuth2Client).catch(err => err.message))
+  );
 }
 
 module.exports = initialize;

@@ -30,7 +30,7 @@ function fetchEssaysText(auth) {
           const { files } = res.data;
           if (files && files.length) {
             downloadEssays(drive, files)
-              .then(msgs => write("log.log", JSON.stringify(msgs)))
+              .then(msgs => msgs.forEach(msg => console.log(msg)))
               .then(() => writeUploadDate(files))
               .then(msg => resolve(msg))
               .catch(err => reject(err));

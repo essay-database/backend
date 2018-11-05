@@ -19,9 +19,15 @@ try {
 
 function initialize() {
   return new Promise((resolve, reject) => {
-    authorize([fetchEssaysText])
-      .then(msgs => resolve(msgs))
-      .catch(err => reject(err));
+    authorize([fetchEssaysDetails, createEssaysData, fetchEssaysText])
+      .then(msgs => {
+        console.log("here");
+        return resolve(msgs);
+      })
+      .catch(err => {
+        console.error("here wrr");
+        return reject(err);
+      });
   });
 }
 
