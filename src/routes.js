@@ -3,11 +3,21 @@ const {
   getEssay,
   getEssays,
   createError,
-  getFeaturedEssays
+  getFeaturedEssays,
+  initialize
 } = require("./api");
 
 const ROUTER = express.Router();
 const STATUS_OK = 200;
+
+ROUTER.get("/init", async (req, res, next) => {
+  try {
+    const msgs = await initialize();
+    res.status(STATUS_OK).json(msgs);
+  } catch (error) {
+    createError(500, error.message, next);
+  }
+});
 
 ROUTER.get("/", async (req, res, next) => {
   try {
