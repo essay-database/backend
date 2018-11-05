@@ -56,14 +56,14 @@ function writeUploadDate(files) {
   });
 }
 
-async function downloadEssays(drive, files) {
-  const results = [];
-  for (const file of files) {
-    results.push(
-      await downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
-    );
-  }
-  return results;
+function downloadEssays(drive, files) {
+  return Promise.all(
+    files.map(file =>
+      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`)).catch(
+        err => err.message
+      )
+    )
+  );
 }
 
 function downloadEssay(drive, fileId, filename) {
@@ -82,7 +82,7 @@ function downloadEssay(drive, fileId, filename) {
           console.error(`error exporting file: ${fileId} retrying...`);
           setTimeout(
             () => resolve(downloadEssay(drive, fileId, filename)),
-            100
+            500
           );
         } else
           res.data
