@@ -30,7 +30,7 @@ function fetchEssaysText(auth) {
           const { files } = res.data;
           if (files && files.length) {
             downloadEssays(drive, files)
-              .then(msgs => msgs.forEach(console.log))
+              .then(msgs => write("log.log", JSON.stringify(msgs)))
               .then(() => writeUploadDate(files))
               .then(msg => resolve(msg))
               .catch(err => reject(err));
@@ -82,9 +82,10 @@ function downloadEssay(drive, fileId, filename) {
         if (err) {
           console.error(`error exporting file: ${fileId}`);
           console.log(`retrying...`);
-          setTimeout(() => {
-            downloadEssay(drive, fileId, filename);
-          }, 1000);
+          setTimeout(
+            () => resolve(downloadEssay(drive, fileId, filename)),
+            100
+          );
         } else
           res.data
             .on("end", () => {

@@ -98,9 +98,7 @@ function getNewToken(oAuth2Client, callbacks) {
 }
 
 function execCallbacks(callbacks, oAuth2Client) {
-  return Promise.all(
-    callbacks.map(callback => callback(oAuth2Client).catch(err => err.message))
-  );
+  return Promise.all(callbacks.map(callback => callback(oAuth2Client)));
 }
 
 module.exports = initialize;

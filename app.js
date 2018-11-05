@@ -15,7 +15,7 @@ app.get("/init", async (req, res, next) => {
     createError(500, error.message, next);
     return;
   }
-  res.status(STATUS_OK).json(msgs);
+  res.status(STATUS_OK).send(msgs);
 });
 
 app.use("/essays", essaysRouter);

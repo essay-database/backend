@@ -28,6 +28,7 @@ function fetchEssaysDetails(auth) {
           const rows = res.data.values;
           if (rows && rows.length) {
             const data = JSON.stringify(convertObj(rows));
+
             write(SPREADSHEET_FILE, data)
               .then(msg => resolve(msg))
               .catch(err => reject(err));
