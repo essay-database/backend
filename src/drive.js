@@ -30,8 +30,9 @@ function fetchEssaysText(auth) {
           const { files } = res.data;
           if (files && files.length) {
             downloadEssays(drive, files)
-              .then(() => writeCreateTime(files))
-              .then(msgs => resolve(msgs))
+              .then(msgs => msgs.forEach(console.log))
+              .then(() => writeUploadDate(files))
+              .then(msg => resolve(msg))
               .catch(err => reject(err));
           } else {
             reject(Error("no files found."));
@@ -42,7 +43,7 @@ function fetchEssaysText(auth) {
   });
 }
 
-function writeCreateTime(files) {
+function writeUploadDate(files) {
   const data = ESSAYS_DATA;
   for (const { id, createdTime } of files) {
     const entry = data.find(entry => entry.id === id);
@@ -78,8 +79,13 @@ function downloadEssay(drive, fileId, filename) {
         responseType: "stream"
       },
       (err, res) => {
-        if (err) reject(Error(`error exporting file: ${filename}`));
-        else
+        if (err) {
+          console.error(`error exporting file: ${fileId}`);
+          console.log(`retrying...`);
+          setTimeout(() => {
+            downloadEssay(drive, fileId, filename);
+          }, 1000);
+        } else
           res.data
             .on("end", () => {
               resolve(`finished downloading ${filename}`);

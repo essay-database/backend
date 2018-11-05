@@ -63,24 +63,13 @@ function createEssaysData() {
           fileNames.filter(file => file.endsWith(".txt")),
           SPREADSHEET_DATA
         )
+          .then(files => files.filter(file => !(file instanceof Error)))
           .then(files => write(ESSAYS_FILE, JSON.stringify(files)))
           .then(msgs => resolve(msgs))
           .catch(err => resolve(err));
       }
     });
   });
-}
-
-function format(essay, essayText) {
-  const sep = "||";
-  let paragraphs = essayText.replace(/[\n\r]+/g, sep);
-  paragraphs = paragraphs.replace(/\uFEFF/g, "");
-  paragraphs = paragraphs.split(sep);
-  essay.paragraphs = paragraphs;
-  delete essay.links;
-  delete essay.author;
-  delete essay.email;
-  return essay;
 }
 
 function compileEssay(fileName, data) {
@@ -96,7 +85,7 @@ function compileEssay(fileName, data) {
 
 function compileEssays(files, data) {
   return Promise.all(
-    files.map(file => compileEssay(file, data).catch(err => err.message))
+    files.map(file => compileEssay(file, data).catch(err => err))
   );
 }
 
@@ -105,6 +94,18 @@ function createError(status, message, next) {
   error.status = status;
   if (next) return next(error);
   return error;
+}
+
+function format(essay, essayText) {
+  const sep = "||";
+  let paragraphs = essayText.replace(/[\n\r]+/g, sep);
+  paragraphs = paragraphs.replace(/\uFEFF/g, "");
+  paragraphs = paragraphs.split(sep);
+  essay.paragraphs = paragraphs;
+  delete essay.links;
+  delete essay.author;
+  delete essay.email;
+  return essay;
 }
 
 module.exports = {

@@ -1,9 +1,7 @@
 /* eslint-disable */
 const fs = require("fs");
 const readline = require("readline");
-const {
-  google
-} = require("googleapis");
+const { google } = require("googleapis");
 
 // If modifying these scopes, delete token.json.
 const SCOPES = ["https://www.googleapis.com/auth/drive"];
@@ -23,11 +21,7 @@ fs.readFile("credentials.json", (err, content) => {
  * @param {function} callback The callback to call with the authorized client.
  */
 function authorize(credentials, callback) {
-  const {
-    client_secret,
-    client_id,
-    redirect_uris
-  } = credentials.installed;
+  const { client_secret, client_id, redirect_uris } = credentials.installed;
   const oAuth2Client = new google.auth.OAuth2(
     client_id,
     client_secret,
@@ -82,17 +76,18 @@ function listFiles(auth) {
     version: "v3",
     auth
   });
-  drive.files.list({
+  drive.files.list(
+    {
       pageSize: 13,
       q: `'1H8P-D5dLkq4nq2AnjPk8cr3DRR_efS9J' in parents and trashed = false`,
-      fields: "nextPageToken, files(id, name)",
+      fields: "nextPageToken, files(id, name)"
     },
     (err, res) => {
       if (err) return console.log(`The API returned an error: ${err}`);
       const files = res.data.files;
       if (files.length) {
         for (const file of files) {
-          download(drive, file.id)
+          download(drive, file.id);
         }
       } else {
         console.log("No files found.");
@@ -103,24 +98,31 @@ function listFiles(auth) {
 
 function download(drive, fileId) {
   var dest = fs.createWriteStream(`${fileId}.txt`);
-  drive.files.export({
+  drive.files.export(
+    {
       fileId,
       mimeType: "text/plain"
-    }, {
+    },
+    {
       responseType: "stream"
     },
     (err, res) => {
-      if (err) console.log(`error exporting file: ${fileId}`)
+      if (err) {
+        console.error(`error exporting file: ${fileId}`)
+        console.log('retrying...')
+        setTimeout(() => {
+          download(drive, fileId)
+        }, 1000);
+      }
       else
         res.data
-        .on("end", () => {
-          console.log('Done');
-        })
-        .on("error", err => {
-          console.log('Error during download ', fileId);
-        })
-        .pipe(dest);
+          .on("end", () => {
+            console.log("Done: " + fileId);
+          })
+          .on("error", err => {
+            console.log("Error during download ", fileId);
+          })
+          .pipe(dest);
     }
   );
-
 }
