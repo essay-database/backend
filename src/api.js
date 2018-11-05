@@ -8,21 +8,18 @@ let ESSAYS_DATA;
 
 const authorize = require("./authorization");
 // const fetchEssaysDetails = require("./sheets");
-// const fetchEssaysText = require("./drive");
+const fetchEssaysText = require("./drive");
 
-function load() {
-  try {
-    SPREADSHEET_DATA = require(SPREADSHEET_FILE);
-    ESSAYS_DATA = require(ESSAYS_FILE);
-  } catch (e) {
-    console.error(`error loading file: ${e}`);
-  }
+try {
+  SPREADSHEET_DATA = require(SPREADSHEET_FILE);
+  ESSAYS_DATA = require(ESSAYS_FILE);
+} catch (e) {
+  console.error(`error loading file: ${e}`);
 }
 
 function initialize() {
-  load();
   return new Promise((resolve, reject) => {
-    authorize([createEssaysData])
+    authorize([fetchEssaysText])
       .then(msgs => resolve(msgs))
       .catch(err => reject(err));
   });
@@ -40,13 +37,6 @@ function getEssay(id) {
   });
 }
 
-function getFeaturedEssays() {
-  return new Promise((resolve, reject) => {
-    if (!ESSAYS_DATA) reject(Error("essays not found"));
-    else resolve(ESSAYS_DATA.filter(essay => essay.featured === true));
-  });
-}
-
 function getEssays() {
   return new Promise((resolve, reject) => {
     if (!ESSAYS_DATA) {
@@ -54,6 +44,13 @@ function getEssays() {
     } else {
       resolve(ESSAYS_DATA);
     }
+  });
+}
+
+function getFeaturedEssays() {
+  return new Promise((resolve, reject) => {
+    if (!ESSAYS_DATA) reject(Error("essays not found"));
+    else resolve(ESSAYS_DATA.filter(essay => essay.featured === true));
   });
 }
 
@@ -81,9 +78,8 @@ function format(essay, essayText) {
   paragraphs = paragraphs.split(sep);
   essay.paragraphs = paragraphs;
   delete essay.links;
-  delete essay.featured;
+  delete essay.author;
   delete essay.email;
-  essay.dateUploaded = new Date();
   return essay;
 }
 

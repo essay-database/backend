@@ -1,7 +1,10 @@
 const { join } = require("path");
 const { createWriteStream } = require("fs");
 const { google } = require("googleapis");
-const { ESSAY_FOLDER_ID, ESSAYS_PATH } = require("../config.js");
+const { ESSAY_FOLDER_ID, ESSAYS_PATH, ESSAYS_FILE } = require("../config.js");
+const { write } = require("./shared");
+
+const ESSAYS_DATA = require(ESSAYS_FILE);
 
 const OPTIONS = {
   orderBy: `createdTime desc`,
@@ -18,7 +21,7 @@ function fetchEssaysText(auth) {
     drive.files.list(
       {
         ...OPTIONS,
-        fields: "nextPageToken, files(id)"
+        fields: "nextPageToken, files(id,createdTime)"
       },
       (err, res) => {
         if (err) {
@@ -27,6 +30,7 @@ function fetchEssaysText(auth) {
           const { files } = res.data;
           if (files && files.length) {
             downloadEssays(drive, files)
+              .then(files => writeCreateTime(files))
               .then(msgs => resolve(msgs))
               .catch(err => reject(err));
           } else {
@@ -38,10 +42,27 @@ function fetchEssaysText(auth) {
   });
 }
 
+function writeCreateTime(files) {
+  const data = ESSAYS_DATA;
+  for (const { id, createdTime } of files) {
+    const entry = data.find(entry => entry.id === id);
+    if (entry) entry.dateUploaded = createdTime;
+    else console.error(`entry not found: ${id}`);
+  }
+
+  return new Promise((resolve, reject) => {
+    write(ESSAYS_FILE, JSON.stringify(data))
+      .then(msg => resolve(msg))
+      .catch(err => reject(err));
+  });
+}
+
 function downloadEssays(drive, files) {
   return Promise.all(
     files.map(file =>
-      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`))
+      downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`)).catch(
+        err => err
+      )
     )
   );
 }
