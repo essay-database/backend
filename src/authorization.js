@@ -97,10 +97,13 @@ function getNewToken(oAuth2Client, callbacks) {
   });
 }
 
+// order of callbacks matters
 async function execCallbacks(callbacks, oAuth2Client) {
-  return Promise.all(
-    callbacks.map(callback => callback(oAuth2Client).catch(err => err.message))
-  );
+  const results = [];
+  for (const callback of callbacks) {
+    results.push(await callback(oAuth2Client));
+  }
+  return results;
 }
 
 module.exports = initialize;

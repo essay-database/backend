@@ -19,7 +19,7 @@ try {
 
 function initialize() {
   return new Promise((resolve, reject) => {
-    authorize([fetchEssaysDetails, fetchEssaysText, createEssaysData])
+    authorize([fetchEssaysDetails, fetchEssaysText, createEssaysFile])
       .then(msgs => resolve(msgs))
       .catch(err => reject(err));
   });
@@ -54,7 +54,7 @@ function getFeaturedEssays() {
   });
 }
 
-function createEssaysData() {
+function createEssaysFile() {
   return new Promise((resolve, reject) => {
     readdir(ESSAYS_PATH, (err, fileNames) => {
       if (err) reject(err);
@@ -72,6 +72,17 @@ function createEssaysData() {
   });
 }
 
+function compileEssays(files, data) {
+  return Promise.all(
+    files.map(file =>
+      compileEssay(file, data).catch(err => {
+        console.error(err.message);
+        return err;
+      })
+    )
+  );
+}
+
 function compileEssay(fileName, data) {
   return new Promise((resolve, reject) => {
     const essay = data.find(detail => fileName.includes(detail.id));
@@ -81,15 +92,6 @@ function compileEssay(fileName, data) {
         .catch(err => reject(err));
     else reject(Error(`essay not found: ${fileName}`));
   });
-}
-
-async function compileEssays(files, data) {
-  files.map(file =>
-    compileEssay(file, data).catch(err => {
-      console.error(err.message);
-      return err;
-    })
-  );
 }
 
 function createError(status, message, next) {
