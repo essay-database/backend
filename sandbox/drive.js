@@ -91,9 +91,9 @@ function listFiles(auth) {
       if (err) return console.log(`The API returned an error: ${err}`);
       const files = res.data.files;
       if (files.length) {
-        files.forEach(file => {
+        for (const file of files) {
           download(drive, file.id)
-        });
+        }
       } else {
         console.log("No files found.");
       }
