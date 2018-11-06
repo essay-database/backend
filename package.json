@@ -23,8 +23,7 @@
     "start": "node index.js",
     "build": "",
     "dev": "PORT=4000 nodemon --ignore essays/ index.js",
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "heroku": "git push heroku master && heroku open"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
