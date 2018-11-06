@@ -1,8 +1,10 @@
+const cors = require("cors");
 const express = require("express");
 const essaysRouter = require("./src/routes");
 const { createError } = require("./src/api");
 
 const app = express();
+app.use(cors());
 app.use(express.json());
 app.use("/essays", essaysRouter);
 
