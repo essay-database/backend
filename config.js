@@ -11,5 +11,8 @@ module.exports = {
   },
   get ESSAYS_FILE() {
     return join(this.ESSAYS_PATH, "essays.json");
+  },
+  get IMAGES_FILE() {
+    return join(this.ESSAYS_PATH, "picsum.json");
   }
 };

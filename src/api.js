@@ -1,16 +1,25 @@
 const { readdir } = require("fs");
 const { join } = require("path");
-const { ESSAYS_PATH, SPREADSHEET_FILE, ESSAYS_FILE } = require("../config.js");
-const { write, read } = require("./shared");
-
-let SPREADSHEET_DATA;
-let ESSAYS_DATA;
-
+const {
+  ESSAYS_PATH,
+  SPREADSHEET_FILE,
+  ESSAYS_FILE,
+  IMAGES_FILE
+} = require("../config.js");
 const authorize = require("./authorization");
 const fetchEssaysDetails = require("./sheets");
 const fetchEssaysText = require("./drive");
+const { write, read, selectRandom } = require("./shared");
+
+let SPREADSHEET_DATA;
+let ESSAYS_DATA;
+let IMAGES_DATA;
+const RECENT_DAYS = 30;
+const WIDTH = 1920;
+const HEIGHT = WIDTH / 2;
 
 try {
+  IMAGES_DATA = require(IMAGES_FILE);
   SPREADSHEET_DATA = require(SPREADSHEET_FILE);
   ESSAYS_DATA = require(ESSAYS_FILE);
 } catch (e) {
@@ -94,13 +103,6 @@ function compileEssay(fileName, data) {
   });
 }
 
-function createError(status, message, next) {
-  const error = new Error(message);
-  error.status = status;
-  if (next) return next(error);
-  return error;
-}
-
 function format(essay, essayText) {
   const sep = "||";
   let paragraphs = essayText.replace(/[\n\r]+/g, sep);
@@ -110,7 +112,33 @@ function format(essay, essayText) {
   delete essay.links;
   delete essay.author;
   delete essay.email;
-  return essay;
+  return {
+    ...essay,
+    tag: getTag(essay),
+    imageLink: getImage(),
+    facebookShareLink: "#",
+    twitterShareLink: "#"
+  };
+}
+
+const getImage = picsum();
+function picsum() {
+  const images = IMAGES_DATA.map(img => img.id);
+  return () =>
+    `https://picsum.photos/${WIDTH}/${HEIGHT}?image=${selectRandom(images)}`;
+}
+
+function getTag(essay) {
+  if (essay.featured) return "featured";
+  if (essay.dateUploaded <= RECENT_DAYS) return "new";
+  return "popular";
+}
+
+function createError(status, message, next) {
+  const error = new Error(message);
+  error.status = status;
+  if (next) return next(error);
+  return error;
 }
 
 module.exports = {
