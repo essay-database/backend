@@ -21,18 +21,16 @@
   },
   "scripts": {
     "start": "node index.js",
-    "build": "",
-    "dev": "PORT=4000 nodemon --ignore essays/ index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "PORT=4000 nodemon --ignore essays/ index.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/essayDB/backend.git"
   },
   "author": {
-    "email": "",
-    "name": "essaydb",
-    "url": ""
+    "email": "info@essaydatabase.org",
+    "name": "essaydatabase",
+    "url": "essaydatabase.org"
   },
   "private": true,
   "license": "UNLICENCED"
