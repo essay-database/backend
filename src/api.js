@@ -14,7 +14,7 @@ const { write, read, selectRandom } = require("./shared");
 let SPREADSHEET_DATA;
 let ESSAYS_DATA;
 let IMAGES_DATA;
-const RECENT_DAYS = 30;
+
 const WIDTH = 1920;
 const HEIGHT = WIDTH / 2;
 
@@ -130,8 +130,7 @@ function picsum() {
 
 function getTag(essay) {
   if (essay.featured) return "featured";
-  if (essay.dateUploaded <= RECENT_DAYS) return "new";
-  return "popular";
+  return Math.random() < 0.5 ? "new" : "popular";
 }
 
 function createError(status, message, next) {
