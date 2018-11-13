@@ -30,7 +30,7 @@ Thumbs.db
 
 # nodejs #
 ######################
-node_modules
+node_modules/
 
 # secrets #
 ######################
@@ -41,5 +41,5 @@ config.json
 docker.sh
 # other #
 ######################
-.vscode
+.vscode/
 sandbox/
