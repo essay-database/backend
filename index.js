@@ -1,7 +1,8 @@
 const http = require("http");
 const app = require("./app");
+require("dotenv").config();
 
-const port = normalizePort(process.env.PORT || "4000");
+const port = normalizePort(process.env.PORT || "8080");
 app.set("port", port);
 const server = http.createServer(app);
 server.listen(port);

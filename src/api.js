@@ -115,9 +115,7 @@ function format(essay, essayText) {
   return {
     ...essay,
     tag: getTag(essay),
-    imageLink: getImage(),
-    facebookShareLink: "#",
-    twitterShareLink: "#"
+    imageLink: getImage()
   };
 }
 

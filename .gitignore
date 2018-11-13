@@ -31,5 +31,15 @@ Thumbs.db
 # nodejs #
 ######################
 node_modules
+
+# secrets #
+######################
+credentials.json
+token.json
+config.json
+.env
+docker.sh
+# other #
+######################
 .vscode
 sandbox/
