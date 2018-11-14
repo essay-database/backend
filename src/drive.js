@@ -11,7 +11,7 @@ const { write } = require("./shared");
 const SPREADSHEET_DATA = require(SPREADSHEET_FILE);
 const OPTIONS = {
   orderBy: `createdTime desc`,
-  pageSize: 13,
+  pageSize: 50,
   q: `'${ESSAY_FOLDER_ID}' in parents and trashed = false`
 };
 
@@ -83,7 +83,7 @@ function downloadEssay(drive, fileId, filename) {
       },
       (err, res) => {
         if (err) {
-          console.error(`error exporting file: ${fileId} retrying...`);
+          console.error(`error exporting file: ${fileId} \nretrying...`);
           setTimeout(
             () => resolve(downloadEssay(drive, fileId, filename)),
             500

@@ -97,7 +97,7 @@ function getNewToken(oAuth2Client, callbacks) {
   });
 }
 
-// order of callbacks matters
+// exec callbacks in order
 async function execCallbacks(callbacks, oAuth2Client) {
   const results = [];
   for (const callback of callbacks) {

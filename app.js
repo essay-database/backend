@@ -1,12 +1,18 @@
 const cors = require("cors");
 const express = require("express");
+const compression = require("compression");
 const essaysRouter = require("./src/routes");
 const { createError } = require("./src/api");
 
 const app = express();
 app.use(cors());
+app.use(compression());
 app.use(express.json());
 app.use("/essays", essaysRouter);
+
+app.get("/", (req, res) => {
+  res.status(200).send("api on standby...");
+});
 
 // catch 404 and forward to error handler
 app.use((req, res, next) => {
