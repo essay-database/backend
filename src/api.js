@@ -26,6 +26,12 @@ try {
   console.error(`error loading file: ${e}`);
 }
 
+// function updateData(interval = 100) {
+//   setInterval(() => {
+//     initialize();
+//   }, interval);
+// }
+
 function initialize() {
   return new Promise((resolve, reject) => {
     authorize([fetchEssaysDetails, fetchEssaysText, createEssaysFile])
