@@ -9,10 +9,12 @@ const {
 const { write } = require("./shared");
 
 const SPREADSHEET_DATA = require(SPREADSHEET_FILE);
+
 const OPTIONS = {
   orderBy: `createdTime desc`,
-  pageSize: 50,
-  q: `'${ESSAY_FOLDER_ID}' in parents and trashed = false`
+  pageSize: 100,
+  q: `'${ESSAY_FOLDER_ID}' in parents and trashed = false`,
+  fields: "nextPageToken, files(id,createdTime)"
 };
 
 function fetchEssaysText(auth) {
@@ -21,37 +23,34 @@ function fetchEssaysText(auth) {
     auth
   });
   return new Promise((resolve, reject) => {
-    drive.files.list(
-      {
-        ...OPTIONS,
-        fields: "nextPageToken, files(id,createdTime)"
-      },
-      (err, res) => {
-        if (err) {
-          reject(err);
+    drive.files.list(OPTIONS, (err, res) => {
+      if (err) {
+        reject(err);
+      } else {
+        const { files } = res.data;
+        if (files && files.length) {
+          downloadEssays(drive, files)
+            .then(msgs => {
+              msgs.forEach(msg => console.log(msg));
+              console.log(`drive: ${files.length} files downloaded`);
+            })
+            .then(() => updateCreationTime(files))
+            .then(msg => resolve(msg))
+            .catch(err => reject(err));
         } else {
-          const { files } = res.data;
-          if (files && files.length) {
-            downloadEssays(drive, files)
-              .then(msgs => msgs.forEach(msg => console.log(msg)))
-              .then(() => writeUploadDates(files))
-              .then(msg => resolve(msg))
-              .catch(err => reject(err));
-          } else {
-            reject(Error("no files found."));
-          }
+          reject(Error("no files found."));
         }
       }
-    );
+    });
   });
 }
 
-function writeUploadDates(files) {
+function updateCreationTime(files) {
   const data = SPREADSHEET_DATA;
   for (const { id, createdTime } of files) {
     const entry = data.find(entry => entry.id === id);
     if (entry) entry.dateUploaded = createdTime;
-    else console.error(`entry not found: ${id}`);
+    else console.error(`drive: entry not found: ${id}`);
   }
   return new Promise((resolve, reject) => {
     write(SPREADSHEET_FILE, JSON.stringify(data))
@@ -64,7 +63,7 @@ function downloadEssays(drive, files) {
   return Promise.all(
     files.map(file =>
       downloadEssay(drive, file.id, join(ESSAYS_PATH, `${file.id}.txt`)).catch(
-        err => err.message
+        err => err
       )
     )
   );
@@ -83,7 +82,7 @@ function downloadEssay(drive, fileId, filename) {
       },
       (err, res) => {
         if (err) {
-          console.error(`error exporting file: ${fileId} \nretrying...`);
+          console.error(`drive: error exporting file: ${fileId}\nretrying...`);
           setTimeout(
             () => resolve(downloadEssay(drive, fileId, filename)),
             500

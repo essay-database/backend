@@ -7,7 +7,9 @@ const {
 const { write } = require("./shared");
 
 const OPTIONS = {
-  valueRenderOption: "UNFORMATTED_VALUE"
+  valueRenderOption: "UNFORMATTED_VALUE",
+  spreadsheetId: SPREADSHEET_SHEET_ID,
+  range: SPREADSHEET_RANGE
 };
 
 function fetchEssaysDetails(auth) {
@@ -16,27 +18,23 @@ function fetchEssaysDetails(auth) {
     auth
   });
   return new Promise((resolve, reject) => {
-    sheets.spreadsheets.values.get(
-      {
-        spreadsheetId: SPREADSHEET_SHEET_ID,
-        range: SPREADSHEET_RANGE,
-        ...OPTIONS
-      },
-      (err, res) => {
-        if (err) reject(err);
-        else {
-          const rows = res.data.values;
-          if (rows && rows.length) {
-            const data = JSON.stringify(convertObj(rows));
-            write(SPREADSHEET_FILE, data)
-              .then(msg => resolve(msg))
-              .catch(err => reject(err));
-          } else {
-            reject(Error("no data found."));
-          }
+    sheets.spreadsheets.values.get(OPTIONS, (err, res) => {
+      if (err) reject(err);
+      else {
+        const rows = res.data.values;
+        if (rows && rows.length) {
+          const data = JSON.stringify(convertObj(rows));
+          write(SPREADSHEET_FILE, data)
+            .then(msg => {
+              console.log(`sheets: ${rows.length} rows downloaded`);
+              return resolve(msg);
+            })
+            .catch(err => reject(err));
+        } else {
+          reject(Error("no data found."));
         }
       }
-    );
+    });
   });
 }
 

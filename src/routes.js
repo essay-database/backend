@@ -5,7 +5,7 @@ const {
   createError,
   getFeaturedEssays,
   initialize
-} = require("./api");
+} = require("./essays");
 
 const ROUTER = express.Router();
 const STATUS_OK = 200;

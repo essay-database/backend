@@ -2,7 +2,7 @@ const cors = require("cors");
 const express = require("express");
 const compression = require("compression");
 const essaysRouter = require("./src/routes");
-const { createError } = require("./src/api");
+const { createError } = require("./src/essays");
 
 const app = express();
 app.use(cors());
