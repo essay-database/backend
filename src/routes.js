@@ -1,11 +1,5 @@
 const express = require("express");
-const {
-  getEssay,
-  getEssays,
-  createError,
-  getFeaturedEssays,
-  initialize
-} = require("./essays");
+const { getEssay, getEssays, createError, initialize } = require("./essays");
 
 const ROUTER = express.Router();
 const STATUS_OK = 200;
@@ -21,16 +15,7 @@ ROUTER.get("/init", async (req, res, next) => {
 
 ROUTER.get("/", async (req, res, next) => {
   try {
-    const essays = await getEssays();
-    res.status(STATUS_OK).json(essays);
-  } catch (err) {
-    createError(500, err.message, next);
-  }
-});
-
-ROUTER.get("/featured", async (req, res, next) => {
-  try {
-    const essays = await getFeaturedEssays();
+    const essays = await getEssays(req.query.tag);
     res.status(STATUS_OK).json(essays);
   } catch (err) {
     createError(500, err.message, next);

@@ -31,20 +31,15 @@ function getEssay(id) {
   });
 }
 
-function getEssays() {
+function getEssays(tag) {
   return new Promise((resolve, reject) => {
     if (!ESSAYS_DATA) {
       reject(Error(`essays not found`));
     } else {
-      resolve(ESSAYS_DATA);
+      let essays = ESSAYS_DATA;
+      if (tag) essays = essays.filter(essay => essay.tag === tag);
+      resolve(essays);
     }
-  });
-}
-
-function getFeaturedEssays() {
-  return new Promise((resolve, reject) => {
-    if (!ESSAYS_DATA) reject(Error("essays not found"));
-    else resolve(ESSAYS_DATA.filter(essay => essay.featured === true));
   });
 }
 
@@ -59,6 +54,5 @@ module.exports = {
   getEssay,
   getEssays,
   initialize,
-  getFeaturedEssays,
   createError
 };

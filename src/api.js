@@ -86,7 +86,9 @@ function picsum() {
 }
 
 function getTag(essay) {
-  if (essay.featured) return "featured";
+  const { featured } = essay;
+  delete essay.featured;
+  if (featured) return "featured";
   return Math.random() < 0.5 ? "new" : "popular";
 }
 
