@@ -8,8 +8,10 @@ const {
 } = require("../config.js");
 const { write, read, selectRandom } = require("./shared");
 
-const WIDTH = 1920;
-const HEIGHT = WIDTH / 2;
+const LARGE_WIDTH = 1920;
+const LARGE_HEIGHT = (LARGE_WIDTH * 3) / 5;
+const SMALL_WIDTH = 400;
+const SMALL_HEIGHT = 300;
 let SPREADSHEET_DATA;
 let IMAGES_DATA;
 
@@ -61,10 +63,12 @@ function format(essay, essayText) {
   paragraphs = paragraphs.replace(/\uFEFF/g, "");
   paragraphs = paragraphs.split(sep);
   essay.paragraphs = paragraphs;
+  const { smallImageURL, largeImageURL } = getImage();
   return {
     ...essay,
     tag: getTag(essay),
-    imageLink: getImage()
+    smallImageURL,
+    largeImageURL
   };
 }
 
@@ -72,8 +76,13 @@ const getImage = picsum();
 
 function picsum() {
   const images = IMAGES_DATA.map(img => img.id);
-  return () =>
-    `https://picsum.photos/${WIDTH}/${HEIGHT}?image=${selectRandom(images)}`;
+  return () => {
+    const randomIndex = selectRandom(images);
+    return {
+      largeImageURL: `https://picsum.photos/${LARGE_WIDTH}/${LARGE_HEIGHT}?image=${randomIndex}`,
+      smallImageURL: `https://picsum.photos/${SMALL_WIDTH}/${SMALL_HEIGHT}?image=${randomIndex}`
+    };
+  };
 }
 
 function getTag(essay) {
