@@ -1,14 +1,16 @@
 const cors = require("cors");
 const express = require("express");
 const compression = require("compression");
-const essaysRouter = require("./src/routes");
-const { createError } = require("./src/essays");
+const essaysRouter = require("./src/essays");
+const pageRouter = require("./src/pages");
+const { createError } = require("./src/api");
 
 const app = express();
 app.use(cors());
 app.use(compression());
 app.use(express.json());
 app.use("/essays", essaysRouter);
+app.use("/pages", pageRouter);
 
 app.get("/", (req, res) => {
   res.status(200).send("api on standby...");

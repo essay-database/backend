@@ -1,95 +1,94 @@
-const { readdir } = require("fs");
-const { join } = require("path");
-const {
-  ESSAYS_PATH,
-  SPREADSHEET_FILE,
-  ESSAYS_FILE,
-  IMAGES_FILE
-} = require("../config.js");
-const { write, read, selectRandom } = require("./shared");
+const faker = require("faker");
+const authorize = require("./authorization");
+const fetchSheets = require("./sheets");
+const fetchDrive = require("./drive");
+const createAPIEssaysFile = require("./essaysHelpers");
+const { write } = require("./shared");
+const { ESSAYS_FILE } = require("../config.js");
 
-const LARGE_WIDTH = 1920;
-const LARGE_HEIGHT = (LARGE_WIDTH * 3) / 5;
-const SMALL_WIDTH = 400;
-const SMALL_HEIGHT = 300;
-let SPREADSHEET_DATA;
-let IMAGES_DATA;
-
+let ESSAYS_DATA;
 try {
-  IMAGES_DATA = require(IMAGES_FILE);
-  SPREADSHEET_DATA = require(SPREADSHEET_FILE);
+  ESSAYS_DATA = require(ESSAYS_FILE);
 } catch (e) {
   console.error(`api: error loading file: ${e}`);
+  write(ESSAYS_FILE, JSON.stringify({}));
 }
 
-function createEssaysAPI() {
+function initialize() {
   return new Promise((resolve, reject) => {
-    readdir(ESSAYS_PATH, (err, fileNames) => {
-      if (err) reject(err);
-      else {
-        assembleEssays(
-          fileNames.filter(file => file.endsWith(".txt")),
-          SPREADSHEET_DATA
-        )
-          .then(files => files.filter(file => !(file instanceof Error)))
-          .then(files => write(ESSAYS_FILE, JSON.stringify(files)))
-          .then(msgs => resolve(msgs))
-          .catch(err => resolve(err));
-      }
-    });
+    authorize([fetchSheets, fetchDrive, createAPIEssaysFile])
+      .then(msgs => resolve(msgs))
+      .catch(err => reject(err));
   });
 }
 
-function assembleEssays(files, data) {
-  return Promise.all(
-    files.map(file => assembleEssay(file, data).catch(err => err))
-  );
-}
-
-function assembleEssay(fileName, data) {
+function getEssay(id) {
   return new Promise((resolve, reject) => {
-    const essay = data.find(detail => fileName.includes(detail.id));
-    if (essay)
-      read(join(ESSAYS_PATH, fileName))
-        .then(essayText => resolve(format(essay, essayText)))
-        .catch(err => reject(err));
-    else reject(Error(`api: essay not found: ${fileName}`));
+    if (!ESSAYS_DATA) {
+      reject(Error(`essays not found`));
+    } else {
+      const essay = ESSAYS_DATA.find(essay => essay.id === id);
+      if (!essay) reject(Error(`essay not found ${id}`));
+      else resolve(essay);
+    }
   });
 }
 
-function format(essay, essayText) {
-  const sep = "||";
-  let paragraphs = essayText.replace(/[\n\r]+/g, sep);
-  paragraphs = paragraphs.replace(/\uFEFF/g, "");
-  paragraphs = paragraphs.split(sep);
-  essay.paragraphs = paragraphs;
-  const { smallImageURL, largeImageURL } = getImage();
-  return {
-    ...essay,
-    tag: getTag(essay),
-    smallImageURL,
-    largeImageURL
-  };
+function getEssays(tag) {
+  return new Promise((resolve, reject) => {
+    if (!ESSAYS_DATA) {
+      reject(Error(`essays not found`));
+    } else {
+      let essays = ESSAYS_DATA;
+      if (tag) essays = essays.filter(essay => essay.tag === tag);
+      resolve(essays);
+    }
+  });
 }
 
-const getImage = picsum();
-
-function picsum() {
-  const images = IMAGES_DATA.map(img => img.id);
-  return () => {
-    const randomIndex = selectRandom(images);
-    return {
-      largeImageURL: `https://picsum.photos/${LARGE_WIDTH}/${LARGE_HEIGHT}?image=${randomIndex}`,
-      smallImageURL: `https://picsum.photos/${SMALL_WIDTH}/${SMALL_HEIGHT}?image=${randomIndex}`
-    };
-  };
+function getPage(page) {
+  let results;
+  const numParagraphs = 12;
+  switch (page) {
+    case "about":
+      results = faker.lorem.paragraphs(numParagraphs);
+      break;
+    case "contact":
+      results = faker.lorem.paragraphs(numParagraphs);
+      break;
+    case "help":
+      results = faker.lorem.paragraphs(numParagraphs);
+      break;
+    case "value":
+      results = faker.lorem.paragraphs(numParagraphs);
+      break;
+    case "privacy":
+      results = faker.lorem.paragraphs(numParagraphs);
+      break;
+    case "terms":
+      results = faker.lorem.paragraphs(numParagraphs);
+      break;
+    case "advertise":
+      results = faker.lorem.paragraphs(numParagraphs);
+      break;
+    default:
+      results = faker.lorem.paragraphs(numParagraphs);
+      break;
+  }
+  return results;
 }
 
-function getTag(essay) {
-  const { featured } = essay;
-  delete essay.featured;
-  if (featured) return "featured";
-  return Math.random() < 0.5 ? "new" : "popular";
+function createError(status, message, next) {
+  const error = new Error(message);
+  error.status = status;
+  if (next) return next(error);
+  return error;
 }
 
-module.exports = createEssaysAPI;
+module.exports = {
+  getEssay,
+  getEssays,
+  initialize,
+  getPage,
+  createError
+};

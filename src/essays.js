@@ -1,58 +1,35 @@
-const authorize = require("./authorization");
-const fetchSheets = require("./sheets");
-const fetchDrive = require("./drive");
-const createAPIEssaysFile = require("./api");
-const { ESSAYS_FILE } = require("../config.js");
+const express = require("express");
+const { getEssay, getEssays, createError, initialize } = require("./api");
 
-let ESSAYS_DATA;
-try {
-  ESSAYS_DATA = require(ESSAYS_FILE);
-} catch (e) {
-  console.error(`api: error loading file: ${e}`);
-}
+const ROUTER = express.Router();
+const STATUS_OK = 200;
 
-function initialize() {
-  return new Promise((resolve, reject) => {
-    authorize([fetchSheets, fetchDrive, createAPIEssaysFile])
-      .then(msgs => resolve(msgs))
-      .catch(err => reject(err));
-  });
-}
+ROUTER.get("/init", async (req, res, next) => {
+  try {
+    const msgs = await initialize();
+    res.status(STATUS_OK).json(msgs);
+  } catch (error) {
+    createError(500, error.message, next);
+  }
+});
 
-function getEssay(id) {
-  return new Promise((resolve, reject) => {
-    if (!ESSAYS_DATA) {
-      reject(Error(`essays not found`));
-    } else {
-      const essay = ESSAYS_DATA.find(essay => essay.id === id);
-      if (!essay) reject(Error(`essay not found ${id}`));
-      else resolve(essay);
-    }
-  });
-}
+ROUTER.get("/", async (req, res, next) => {
+  try {
+    const essays = await getEssays(req.query.tag);
+    res.status(STATUS_OK).json(essays);
+  } catch (err) {
+    createError(500, err.message, next);
+  }
+});
 
-function getEssays(tag) {
-  return new Promise((resolve, reject) => {
-    if (!ESSAYS_DATA) {
-      reject(Error(`essays not found`));
-    } else {
-      let essays = ESSAYS_DATA;
-      if (tag) essays = essays.filter(essay => essay.tag === tag);
-      resolve(essays);
-    }
-  });
-}
+ROUTER.get("/:id", async (req, res, next) => {
+  const { id } = req.params;
+  try {
+    const essay = await getEssay(id);
+    res.status(STATUS_OK).json(essay);
+  } catch (error) {
+    createError(404, error.message, next);
+  }
+});
 
-function createError(status, message, next) {
-  const error = new Error(message);
-  error.status = status;
-  if (next) return next(error);
-  return error;
-}
-
-module.exports = {
-  getEssay,
-  getEssays,
-  initialize,
-  createError
-};
+module.exports = ROUTER;

@@ -1,8 +1,8 @@
 const { join } = require("path");
 
 module.exports = {
-  ESSAY_FOLDER_ID: "1H8P-D5dLkq4nq2AnjPk8cr3DRR_efS9J",
-  SPREADSHEET_SHEET_ID: "1VNyrb7Nj5CMo2EARqJKjf99VeYEWWvb4HsSdIOQWiJA",
+  ESSAY_FOLDER_ID: "1KpNNZnPotGysiomSidZ6fjifzs1JYR8s",
+  SPREADSHEET_SHEET_ID: "1prC0elOlEBnRZtAmjd_RBwIQZz3dE_qppsphqer6Iik",
   SPREADSHEET_RANGE: "essays",
   SCOPES: ["https://www.googleapis.com/auth/drive"],
   ESSAYS_PATH: join(__dirname, "essays"),
