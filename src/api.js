@@ -1,4 +1,3 @@
-const faker = require("faker");
 const authorize = require("./authorization");
 const fetchSheets = require("./sheets");
 const fetchDrive = require("./drive");
@@ -46,38 +45,6 @@ function getEssays(tag) {
   });
 }
 
-function getPage(page) {
-  let results;
-  const numParagraphs = 12;
-  switch (page) {
-    case "about":
-      results = faker.lorem.paragraphs(numParagraphs);
-      break;
-    case "contact":
-      results = faker.lorem.paragraphs(numParagraphs);
-      break;
-    case "help":
-      results = faker.lorem.paragraphs(numParagraphs);
-      break;
-    case "value":
-      results = faker.lorem.paragraphs(numParagraphs);
-      break;
-    case "privacy":
-      results = faker.lorem.paragraphs(numParagraphs);
-      break;
-    case "terms":
-      results = faker.lorem.paragraphs(numParagraphs);
-      break;
-    case "advertise":
-      results = faker.lorem.paragraphs(numParagraphs);
-      break;
-    default:
-      results = faker.lorem.paragraphs(numParagraphs);
-      break;
-  }
-  return results;
-}
-
 function createError(status, message, next) {
   const error = new Error(message);
   error.status = status;
@@ -89,6 +56,5 @@ module.exports = {
   getEssay,
   getEssays,
   initialize,
-  getPage,
   createError
 };
